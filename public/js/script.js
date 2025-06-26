@@ -39,6 +39,9 @@ function showTab(tabName) {
 		case "employees":
 			loadEmployees();
 			break;
+		case "reservations":
+			loadReservations();
+			break;
 	}
 }
 
@@ -89,6 +92,18 @@ function setupFormSubmissions() {
 				updateEmployee();
 			} else {
 				addEmployee();
+			}
+		});
+
+	// Reservation form
+	document
+		.getElementById("addReservationForm")
+		.addEventListener("submit", function (e) {
+			e.preventDefault();
+			if (currentEditId && currentEditType === "reservation") {
+				updateReservation();
+			} else {
+				addReservation();
 			}
 		});
 }
@@ -758,6 +773,176 @@ async function confirmDeleteEmployee(id) {
 		showAlert("Lỗi kết nối: " + error.message, "error");
 	}
 	hideDeleteModal();
+}
+
+// ==================== RESERVATION FUNCTIONS ====================
+async function loadReservations() {
+	try {
+		const response = await fetch("/api/reservations");
+		const reservations = await response.json();
+		const tbody = document.querySelector("#reservationsTable tbody");
+		tbody.innerHTML = "";
+		reservations.forEach((r) => {
+			const statusText = {
+				pending: "Chờ xác nhận",
+				confirmed: "Đã xác nhận",
+				cancelled: "Đã hủy",
+			};
+			const row = tbody.insertRow();
+			row.innerHTML = `
+                <td>${r.reservation_id}</td>
+                <td>${r.customer_first_name || ""} ${
+				r.customer_last_name || ""
+			} (ID: ${r.customer_id})</td>
+                <td>${r.table_id}</td>
+                <td>${formatDateTime(r.reservation_time)}</td>
+                <td>${r.number_guests}</td>
+                <td><span class="status-badge status-${r.status}">${
+				statusText[r.status]
+			}</span></td>
+                <td class="action-buttons">
+                    <button class="btn btn-warning btn-sm" onclick="editReservation(${
+						r.reservation_id
+					})">Sửa</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteReservation(${
+						r.reservation_id
+					})">Xóa</button>
+                </td>
+            `;
+		});
+	} catch (error) {
+		showAlert("Lỗi tải dữ liệu đặt bàn: " + error.message, "error");
+	}
+}
+
+function showAddReservationForm() {
+	document.getElementById("reservationForm").style.display = "block";
+	document.getElementById("addReservationForm").reset();
+	currentEditId = null;
+	currentEditType = null;
+}
+
+function hideReservationForm() {
+	document.getElementById("reservationForm").style.display = "none";
+	currentEditId = null;
+	currentEditType = null;
+}
+
+async function addReservation() {
+	const formData = {
+		customer_id: parseInt(
+			document.getElementById("reservation_customer_id").value
+		),
+		table_id: parseInt(
+			document.getElementById("reservation_table_id").value
+		),
+		reservation_time: document.getElementById("reservation_time").value,
+		number_guests: parseInt(
+			document.getElementById("reservation_number_guests").value
+		),
+		status: document.getElementById("reservation_status").value,
+	};
+	try {
+		const response = await fetch("/api/reservations", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(formData),
+		});
+		const result = await response.json();
+		if (result.success) {
+			showAlert("Thêm đặt bàn thành công!", "success");
+			hideReservationForm();
+			loadReservations();
+		} else {
+			showAlert("Lỗi: " + result.error, "error");
+		}
+	} catch (error) {
+		showAlert("Lỗi kết nối: " + error.message, "error");
+	}
+}
+
+async function editReservation(id) {
+	try {
+		const response = await fetch("/api/reservations");
+		const reservations = await response.json();
+		const r = reservations.find((r) => r.reservation_id === id);
+		if (r) {
+			document.getElementById("reservation_customer_id").value =
+				r.customer_id;
+			document.getElementById("reservation_table_id").value = r.table_id;
+			document.getElementById("reservation_time").value =
+				r.reservation_time ? r.reservation_time.slice(0, 16) : "";
+			document.getElementById("reservation_number_guests").value =
+				r.number_guests;
+			document.getElementById("reservation_status").value = r.status;
+			currentEditId = id;
+			currentEditType = "reservation";
+			document.getElementById("reservationForm").style.display = "block";
+		}
+	} catch (error) {
+		showAlert("Lỗi tải thông tin đặt bàn: " + error.message, "error");
+	}
+}
+
+async function updateReservation() {
+	const formData = {
+		customer_id: parseInt(
+			document.getElementById("reservation_customer_id").value
+		),
+		table_id: parseInt(
+			document.getElementById("reservation_table_id").value
+		),
+		reservation_time: document.getElementById("reservation_time").value,
+		number_guests: parseInt(
+			document.getElementById("reservation_number_guests").value
+		),
+		status: document.getElementById("reservation_status").value,
+	};
+	try {
+		const response = await fetch(`/api/reservations/${currentEditId}`, {
+			method: "PUT",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(formData),
+		});
+		const result = await response.json();
+		if (result.success) {
+			showAlert("Cập nhật đặt bàn thành công!", "success");
+			hideReservationForm();
+			loadReservations();
+		} else {
+			showAlert("Lỗi: " + result.error, "error");
+		}
+	} catch (error) {
+		showAlert("Lỗi kết nối: " + error.message, "error");
+	}
+}
+
+function deleteReservation(id) {
+	showDeleteModal(() => confirmDeleteReservation(id));
+}
+
+async function confirmDeleteReservation(id) {
+	try {
+		const response = await fetch(`/api/reservations/${id}`, {
+			method: "DELETE",
+		});
+		const result = await response.json();
+		if (result.success) {
+			showAlert("Xóa đặt bàn thành công!", "success");
+			loadReservations();
+		} else {
+			showAlert("Lỗi: " + result.error, "error");
+		}
+	} catch (error) {
+		showAlert("Lỗi kết nối: " + error.message, "error");
+	}
+	hideDeleteModal();
+}
+
+function formatDateTime(dt) {
+	if (!dt) return "";
+	const d = new Date(dt);
+	return d.toLocaleString("vi-VN");
 }
 
 // ==================== UTILITY FUNCTIONS ====================
