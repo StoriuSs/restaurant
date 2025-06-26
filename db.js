@@ -5,7 +5,7 @@ const dbConfig = {
 	host: "localhost",
 	port: 3307,
 	user: "root",
-	password: "hieu1032006", // Thay đổi password của bạn
+	password: "hieu1032006",
 	database: "restaurant",
 	charset: "utf8mb4",
 };
@@ -16,8 +16,7 @@ const pool = mysql.createPool({
 	connectionLimit: 10,
 	queueLimit: 0,
 	reconnect: true,
-	idleTimeout: 60000,
-	acquireTimeout: 60000,
+	waitForConnections: true,
 });
 
 // Test kết nối
