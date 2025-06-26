@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="vi">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Quản lý Nhà hàng - Restaurant Management</title>
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body>
+		<div class="container">
+			<header>
+				<h1>🍽️ Hệ thống Quản lý Nhà hàng</h1>
+				<p>Giao diện quản lý cơ sở dữ liệu nhà hàng</p>
+			</header>
+
+			<nav class="tabs">
+				<button
+					class="tab-button active"
+					onclick="showTab('customers')">
+					👥 Khách hàng
+				</button>
+				<button class="tab-button" onclick="showTab('dishes')">
+					🍜 Món ăn
+				</button>
+				<button class="tab-button" onclick="showTab('tables')">
+					🪑 Bàn ăn
+				</button>
+				<button class="tab-button" onclick="showTab('employees')">
+					👨‍💼 Nhân viên
+				</button>
+			</nav>
+
+			<!-- Tab Khách hàng -->
+			<div id="customers" class="tab-content active">
+				<div class="section-header">
+					<h2>Quản lý Khách hàng</h2>
+					<button
+						class="btn btn-primary"
+						onclick="showAddCustomerForm()">
+						+ Thêm khách hàng
+					</button>
+				</div>
+
+				<div
+					id="customerForm"
+					class="form-container"
+					style="display: none">
+					<form id="addCustomerForm">
+						<h3>Thông tin khách hàng</h3>
+						<div class="form-group">
+							<label>Họ:</label>
+							<input type="text" id="customer_f_name" required />
+						</div>
+						<div class="form-group">
+							<label>Tên:</label>
+							<input type="text" id="customer_l_name" required />
+						</div>
+						<div class="form-group">
+							<label>Tuổi:</label>
+							<input
+								type="number"
+								id="customer_age"
+								min="0"
+								required />
+						</div>
+						<div class="form-group">
+							<label>Số điện thoại:</label>
+							<input type="tel" id="customer_phone" />
+						</div>
+						<div class="form-group">
+							<label>Email:</label>
+							<input type="email" id="customer_email" />
+						</div>
+						<div class="form-actions">
+							<button type="submit" class="btn btn-success">
+								Lưu
+							</button>
+							<button
+								type="button"
+								class="btn btn-secondary"
+								onclick="hideCustomerForm()">
+								Hủy
+							</button>
+						</div>
+					</form>
+				</div>
+
+				<div class="table-container">
+					<table id="customersTable">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Họ tên</th>
+								<th>Tuổi</th>
+								<th>Điện thoại</th>
+								<th>Email</th>
+								<th>Thao tác</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+				</div>
+			</div>
+
+			<!-- Tab Món ăn -->
+			<div id="dishes" class="tab-content">
+				<div class="section-header">
+					<h2>Quản lý Món ăn</h2>
+					<button class="btn btn-primary" onclick="showAddDishForm()">
+						+ Thêm món ăn
+					</button>
+				</div>
+
+				<div id="dishForm" class="form-container" style="display: none">
+					<form id="addDishForm">
+						<h3>Thông tin món ăn</h3>
+						<div class="form-group">
+							<label>Tên món:</label>
+							<input type="text" id="dish_name" required />
+						</div>
+						<div class="form-group">
+							<label>Danh mục:</label>
+							<input type="text" id="dish_category" />
+						</div>
+						<div class="form-group">
+							<label>Giá (VNĐ):</label>
+							<input
+								type="number"
+								id="dish_price"
+								min="0"
+								required />
+						</div>
+						<div class="form-group">
+							<label>Mô tả:</label>
+							<textarea id="dish_description" rows="3"></textarea>
+						</div>
+						<div class="form-group">
+							<label>
+								<input
+									type="checkbox"
+									id="dish_availability"
+									checked />
+								Còn phục vụ
+							</label>
+						</div>
+						<div class="form-actions">
+							<button type="submit" class="btn btn-success">
+								Lưu
+							</button>
+							<button
+								type="button"
+								class="btn btn-secondary"
+								onclick="hideDishForm()">
+								Hủy
+							</button>
+						</div>
+					</form>
+				</div>
+
+				<div class="table-container">
+					<table id="dishesTable">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Tên món</th>
+								<th>Danh mục</th>
+								<th>Giá</th>
+								<th>Trạng thái</th>
+								<th>Thao tác</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+				</div>
+			</div>
+
+			<!-- Tab Bàn ăn -->
+			<div id="tables" class="tab-content">
+				<div class="section-header">
+					<h2>Quản lý Bàn ăn</h2>
+					<button
+						class="btn btn-primary"
+						onclick="showAddTableForm()">
+						+ Thêm bàn
+					</button>
+				</div>
+
+				<div
+					id="tableForm"
+					class="form-container"
+					style="display: none">
+					<form id="addTableForm">
+						<h3>Thông tin bàn ăn</h3>
+						<div class="form-group">
+							<label>Số ghế:</label>
+							<input
+								type="number"
+								id="table_num_seats"
+								min="1"
+								required />
+						</div>
+						<div class="form-group">
+							<label>Trạng thái:</label>
+							<select id="table_status">
+								<option value="available">Trống</option>
+								<option value="reserved">Đã đặt</option>
+								<option value="occupied">Đang sử dụng</option>
+							</select>
+						</div>
+						<div class="form-actions">
+							<button type="submit" class="btn btn-success">
+								Lưu
+							</button>
+							<button
+								type="button"
+								class="btn btn-secondary"
+								onclick="hideTableForm()">
+								Hủy
+							</button>
+						</div>
+					</form>
+				</div>
+
+				<div class="table-container">
+					<table id="tablesTable">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Số ghế</th>
+								<th>Trạng thái</th>
+								<th>Thao tác</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+				</div>
+			</div>
+
+			<!-- Tab Nhân viên -->
+			<div id="employees" class="tab-content">
+				<div class="section-header">
+					<h2>Quản lý Nhân viên</h2>
+					<button
+						class="btn btn-primary"
+						onclick="showAddEmployeeForm()">
+						+ Thêm nhân viên
+					</button>
+				</div>
+
+				<div
+					id="employeeForm"
+					class="form-container"
+					style="display: none">
+					<form id="addEmployeeForm">
+						<h3>Thông tin nhân viên</h3>
+						<div class="form-row">
+							<div class="form-group">
+								<label>Họ:</label>
+								<input
+									type="text"
+									id="employee_f_name"
+									required />
+							</div>
+							<div class="form-group">
+								<label>Tên:</label>
+								<input
+									type="text"
+									id="employee_l_name"
+									required />
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-group">
+								<label>Ngày sinh:</label>
+								<input type="date" id="employee_dob" required />
+							</div>
+							<div class="form-group">
+								<label>Giới tính:</label>
+								<select id="employee_gender">
+									<option value="male">Nam</option>
+									<option value="female">Nữ</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-group">
+								<label>Ngày tuyển dụng:</label>
+								<input
+									type="date"
+									id="employee_hired_date"
+									required />
+							</div>
+							<div class="form-group">
+								<label>Chức vụ:</label>
+								<select id="employee_role" required>
+									<option value="waiter">Phục vụ</option>
+									<option value="chef">Đầu bếp</option>
+									<option value="cashier">Thu ngân</option>
+								</select>
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-group">
+								<label>Ca làm:</label>
+								<input type="text" id="employee_shift" />
+							</div>
+							<div class="form-group">
+								<label>Lương (triệu VNĐ):</label>
+								<input
+									type="number"
+									id="employee_salary"
+									min="0"
+									step="0.01"
+									placeholder="VD: 10.5" />
+							</div>
+						</div>
+						<div class="form-row">
+							<div class="form-group">
+								<label>Số điện thoại:</label>
+								<input type="tel" id="employee_phone" />
+							</div>
+							<div class="form-group">
+								<label>Email:</label>
+								<input type="email" id="employee_email" />
+							</div>
+						</div>
+						<div class="form-actions">
+							<button type="submit" class="btn btn-success">
+								Lưu
+							</button>
+							<button
+								type="button"
+								class="btn btn-secondary"
+								onclick="hideEmployeeForm()">
+								Hủy
+							</button>
+						</div>
+					</form>
+				</div>
+
+				<div class="table-container">
+					<table id="employeesTable">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Họ tên</th>
+								<th>Ngày sinh</th>
+								<th>Chức vụ</th>
+								<th>Lương</th>
+								<th>Điện thoại</th>
+								<th>Thao tác</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<!-- Modal xác nhận xóa -->
+		<div id="deleteModal" class="modal" style="display: none">
+			<div class="modal-content">
+				<h3>Xác nhận xóa</h3>
+				<p>Bạn có chắc chắn muốn xóa mục này không?</p>
+				<div class="modal-actions">
+					<button id="confirmDelete" class="btn btn-danger">
+						Xóa
+					</button>
+					<button
+						onclick="hideDeleteModal()"
+						class="btn btn-secondary">
+						Hủy
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<script src="script.js"></script>
+	</body>
+</html>
