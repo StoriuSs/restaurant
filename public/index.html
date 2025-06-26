@@ -31,6 +31,9 @@
 				<button class="tab-button" onclick="showTab('reservations')">
 					📅 Đặt bàn
 				</button>
+				<button class="tab-button" onclick="showTab('customerOrders')">
+					🧾 Đơn hàng
+				</button>
 			</nav>
 
 			<!-- Tab Khách hàng -->
@@ -434,6 +437,67 @@
 								<th>Bàn</th>
 								<th>Thời gian</th>
 								<th>Số khách</th>
+								<th>Trạng thái</th>
+								<th>Thao tác</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+				</div>
+			</div>
+
+			<!-- Tab Đơn hàng (CustomerOrder) -->
+			<div id="customerOrders" class="tab-content">
+				<div class="section-header">
+					<h2>Quản lý Đơn hàng</h2>
+					<button
+						class="btn btn-primary"
+						onclick="showAddCustomerOrderForm()">
+						+ Thêm đơn hàng
+					</button>
+				</div>
+				<div
+					id="customerOrderForm"
+					class="form-container"
+					style="display: none">
+					<form id="addCustomerOrderForm">
+						<h3>Thông tin đơn hàng</h3>
+						<div class="form-group">
+							<label>Bàn (ID):</label>
+							<input type="number" id="order_table_id" required />
+						</div>
+						<div class="form-group">
+							<label>Thời gian đặt:</label>
+							<input type="datetime-local" id="order_time" />
+						</div>
+						<div class="form-group">
+							<label>Trạng thái:</label>
+							<select id="order_status">
+								<option value="pending">Chờ phục vụ</option>
+								<option value="served">Đã phục vụ</option>
+								<option value="cancelled">Đã hủy</option>
+							</select>
+						</div>
+						<div class="form-actions">
+							<button type="submit" class="btn btn-success">
+								Lưu
+							</button>
+							<button
+								type="button"
+								class="btn btn-secondary"
+								onclick="hideCustomerOrderForm()">
+								Hủy
+							</button>
+						</div>
+					</form>
+				</div>
+				<div class="table-container">
+					<table id="customerOrdersTable">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Bàn</th>
+								<th>Thời gian</th>
 								<th>Trạng thái</th>
 								<th>Thao tác</th>
 							</tr>

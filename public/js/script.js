@@ -42,6 +42,9 @@ function showTab(tabName) {
 		case "reservations":
 			loadReservations();
 			break;
+		case "customerOrders":
+			loadCustomerOrders();
+			break;
 	}
 }
 
@@ -104,6 +107,18 @@ function setupFormSubmissions() {
 				updateReservation();
 			} else {
 				addReservation();
+			}
+		});
+
+	// CustomerOrder form
+	document
+		.getElementById("addCustomerOrderForm")
+		.addEventListener("submit", function (e) {
+			e.preventDefault();
+			if (currentEditId && currentEditType === "customerOrder") {
+				updateCustomerOrder();
+			} else {
+				addCustomerOrder();
 			}
 		});
 }
@@ -930,6 +945,148 @@ async function confirmDeleteReservation(id) {
 		if (result.success) {
 			showAlert("Xóa đặt bàn thành công!", "success");
 			loadReservations();
+		} else {
+			showAlert("Lỗi: " + result.error, "error");
+		}
+	} catch (error) {
+		showAlert("Lỗi kết nối: " + error.message, "error");
+	}
+	hideDeleteModal();
+}
+
+// ==================== CUSTOMER ORDER FUNCTIONS ====================
+async function loadCustomerOrders() {
+	try {
+		const response = await fetch("/api/customer-orders");
+		const orders = await response.json();
+		const tbody = document.querySelector("#customerOrdersTable tbody");
+		tbody.innerHTML = "";
+		orders.forEach((o) => {
+			const statusText = {
+				pending: "Chờ phục vụ",
+				served: "Đã phục vụ",
+				cancelled: "Đã hủy",
+			};
+			const row = tbody.insertRow();
+			row.innerHTML = `
+                <td>${o.order_id}</td>
+                <td>${o.table_id}</td>
+                <td>${formatDateTime(o.order_time)}</td>
+                <td><span class="status-badge status-${o.status}">${
+				statusText[o.status]
+			}</span></td>
+                <td class="action-buttons">
+                    <button class="btn btn-warning btn-sm" onclick="editCustomerOrder(${
+						o.order_id
+					})">Sửa</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteCustomerOrder(${
+						o.order_id
+					})">Xóa</button>
+                </td>
+            `;
+		});
+	} catch (error) {
+		showAlert("Lỗi tải dữ liệu đơn hàng: " + error.message, "error");
+	}
+}
+
+function showAddCustomerOrderForm() {
+	document.getElementById("customerOrderForm").style.display = "block";
+	document.getElementById("addCustomerOrderForm").reset();
+	currentEditId = null;
+	currentEditType = null;
+}
+
+function hideCustomerOrderForm() {
+	document.getElementById("customerOrderForm").style.display = "none";
+	currentEditId = null;
+	currentEditType = null;
+}
+
+async function addCustomerOrder() {
+	const formData = {
+		table_id: parseInt(document.getElementById("order_table_id").value),
+		order_time: document.getElementById("order_time").value,
+		status: document.getElementById("order_status").value,
+	};
+	try {
+		const response = await fetch("/api/customer-orders", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(formData),
+		});
+		const result = await response.json();
+		if (result.success) {
+			showAlert("Thêm đơn hàng thành công!", "success");
+			hideCustomerOrderForm();
+			loadCustomerOrders();
+		} else {
+			showAlert("Lỗi: " + result.error, "error");
+		}
+	} catch (error) {
+		showAlert("Lỗi kết nối: " + error.message, "error");
+	}
+}
+
+async function editCustomerOrder(id) {
+	try {
+		const response = await fetch("/api/customer-orders");
+		const orders = await response.json();
+		const o = orders.find((o) => o.order_id === id);
+		if (o) {
+			document.getElementById("order_table_id").value = o.table_id;
+			document.getElementById("order_time").value = o.order_time
+				? o.order_time.slice(0, 16)
+				: "";
+			document.getElementById("order_status").value = o.status;
+			currentEditId = id;
+			currentEditType = "customerOrder";
+			document.getElementById("customerOrderForm").style.display =
+				"block";
+		}
+	} catch (error) {
+		showAlert("Lỗi tải thông tin đơn hàng: " + error.message, "error");
+	}
+}
+
+async function updateCustomerOrder() {
+	const formData = {
+		table_id: parseInt(document.getElementById("order_table_id").value),
+		order_time: document.getElementById("order_time").value,
+		status: document.getElementById("order_status").value,
+	};
+	try {
+		const response = await fetch(`/api/customer-orders/${currentEditId}`, {
+			method: "PUT",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(formData),
+		});
+		const result = await response.json();
+		if (result.success) {
+			showAlert("Cập nhật đơn hàng thành công!", "success");
+			hideCustomerOrderForm();
+			loadCustomerOrders();
+		} else {
+			showAlert("Lỗi: " + result.error, "error");
+		}
+	} catch (error) {
+		showAlert("Lỗi kết nối: " + error.message, "error");
+	}
+}
+
+function deleteCustomerOrder(id) {
+	showDeleteModal(() => confirmDeleteCustomerOrder(id));
+}
+
+async function confirmDeleteCustomerOrder(id) {
+	try {
+		const response = await fetch(`/api/customer-orders/${id}`, {
+			method: "DELETE",
+		});
+		const result = await response.json();
+		if (result.success) {
+			showAlert("Xóa đơn hàng thành công!", "success");
+			loadCustomerOrders();
 		} else {
 			showAlert("Lỗi: " + result.error, "error");
 		}
