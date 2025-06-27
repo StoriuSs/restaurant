@@ -46,6 +46,9 @@
 				<button class="tab-button" onclick="showTab('invoices')">
 					🧾 Hóa đơn
 				</button>
+				<button class="tab-button" onclick="showTab('payments')">
+					💳 Thanh toán
+				</button>
 			</nav>
 
 			<!-- Tab Khách hàng -->
@@ -815,6 +818,77 @@
 								<th>Mã giảm giá</th>
 								<th>Tổng tiền</th>
 								<th>Ngày lập</th>
+								<th>Thao tác</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+				</div>
+			</div>
+
+			<!-- Tab Payment (Thanh toán) -->
+			<div id="payments" class="tab-content">
+				<div class="section-header">
+					<h2>Quản lý Thanh toán (Payment)</h2>
+					<button
+						class="btn btn-primary"
+						onclick="showAddPaymentForm()">
+						+ Thêm thanh toán
+					</button>
+				</div>
+				<div
+					id="paymentForm"
+					class="form-container"
+					style="display: none">
+					<form id="addPaymentForm">
+						<h3>Thông tin thanh toán</h3>
+						<div class="form-group">
+							<label>Hóa đơn (ID):</label>
+							<input
+								type="number"
+								id="payment_invoice_id"
+								required />
+						</div>
+						<div class="form-group">
+							<label>Phương thức:</label>
+							<select id="payment_method" required>
+								<option value="cash">Tiền mặt</option>
+								<option value="card">Thẻ</option>
+								<option value="online-transfer">
+									Chuyển khoản
+								</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label>Trạng thái:</label>
+							<select id="payment_status">
+								<option value="pending">Chờ xử lý</option>
+								<option value="success">Thành công</option>
+								<option value="failure">Thất bại</option>
+							</select>
+						</div>
+						<div class="form-actions">
+							<button type="submit" class="btn btn-success">
+								Lưu
+							</button>
+							<button
+								type="button"
+								class="btn btn-secondary"
+								onclick="hidePaymentForm()">
+								Hủy
+							</button>
+						</div>
+					</form>
+				</div>
+				<div class="table-container">
+					<table id="paymentsTable">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Hóa đơn</th>
+								<th>Phương thức</th>
+								<th>Trạng thái</th>
+								<th>Số tiền</th>
 								<th>Thao tác</th>
 							</tr>
 						</thead>

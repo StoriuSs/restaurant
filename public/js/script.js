@@ -57,6 +57,9 @@ function showTab(tabName) {
 		case "invoices":
 			loadInvoices();
 			break;
+		case "payments":
+			loadPayments();
+			break;
 	}
 }
 
@@ -179,6 +182,18 @@ function setupFormSubmissions() {
 				updateInvoice();
 			} else {
 				addInvoice();
+			}
+		});
+
+	// Payment form
+	document
+		.getElementById("addPaymentForm")
+		.addEventListener("submit", function (e) {
+			e.preventDefault();
+			if (currentEditId && currentEditType === "payment") {
+				updatePayment();
+			} else {
+				addPayment();
 			}
 		});
 }
@@ -1832,6 +1847,127 @@ async function confirmDeleteInvoice(id) {
 		showAlert("Lỗi kết nối: " + error.message, "error");
 	}
 	hideDeleteModal();
+}
+
+// ==================== PAYMENT FUNCTIONS ====================
+async function loadPayments() {
+	const response = await fetch("/api/payments");
+	const payments = await response.json();
+	const tbody = document.querySelector("#paymentsTable tbody");
+	tbody.innerHTML = "";
+	payments.forEach((p) => {
+		tbody.innerHTML += `
+            <tr>
+                <td>${p.payment_id}</td>
+                <td>${p.invoice_id}</td>
+                <td>${formatPaymentMethod(p.payment_method)}</td>
+                <td>${formatPaymentStatus(p.status)}</td>
+                <td>${formatCurrency(p.total_amount)}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm" onclick="editPayment(${
+						p.payment_id
+					})">Sửa</button>
+                    <button class="btn btn-danger btn-sm" onclick="deletePayment(${
+						p.payment_id
+					})">Xóa</button>
+                </td>
+            </tr>
+        `;
+	});
+}
+
+function showAddPaymentForm() {
+	document.getElementById("paymentForm").style.display = "block";
+	document.getElementById("addPaymentForm").reset();
+	currentEditId = null;
+	currentEditType = null;
+}
+
+function hidePaymentForm() {
+	document.getElementById("paymentForm").style.display = "none";
+}
+
+async function addPayment() {
+	const invoice_id = document.getElementById("payment_invoice_id").value;
+	const payment_method = document.getElementById("payment_method").value;
+	const status = document.getElementById("payment_status").value;
+	const res = await fetch("/api/payments", {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ invoice_id, payment_method, status }),
+	});
+	const data = await res.json();
+	if (data.success) {
+		hidePaymentForm();
+		loadPayments();
+	} else {
+		alert(data.error || "Lỗi khi thêm thanh toán!");
+	}
+}
+
+async function editPayment(id) {
+	const res = await fetch(`/api/payments/${id}`);
+	const p = await res.json();
+	document.getElementById("paymentForm").style.display = "block";
+	document.getElementById("payment_invoice_id").value = p.invoice_id;
+	document.getElementById("payment_method").value = p.payment_method;
+	document.getElementById("payment_status").value = p.status;
+	currentEditId = id;
+	currentEditType = "payment";
+}
+
+async function updatePayment() {
+	const invoice_id = document.getElementById("payment_invoice_id").value;
+	const payment_method = document.getElementById("payment_method").value;
+	const status = document.getElementById("payment_status").value;
+	const res = await fetch(`/api/payments/${currentEditId}`, {
+		method: "PUT",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ invoice_id, payment_method, status }),
+	});
+	const data = await res.json();
+	if (data.success) {
+		hidePaymentForm();
+		loadPayments();
+	} else {
+		alert(data.error || "Lỗi khi cập nhật thanh toán!");
+	}
+}
+
+async function deletePayment(id) {
+	if (!confirm("Bạn có chắc muốn xóa thanh toán này?")) return;
+	const res = await fetch(`/api/payments/${id}`, { method: "DELETE" });
+	const data = await res.json();
+	if (data.success) {
+		loadPayments();
+	} else {
+		alert(data.error || "Lỗi khi xóa thanh toán!");
+	}
+}
+
+function formatPaymentMethod(method) {
+	switch (method) {
+		case "cash":
+			return "Tiền mặt";
+		case "card":
+			return "Thẻ";
+		case "online-transfer":
+			return "Chuyển khoản";
+		default:
+			return method;
+	}
+}
+function formatPaymentStatus(status) {
+	switch (status) {
+		case "pending":
+			return "Chờ xử lý";
+		case "success":
+			return "Thành công";
+		case "failure":
+			return "Thất bại";
+		default:
+			return status;
+	}
 }
 
 // ==================== UTILITY FUNCTIONS ====================
