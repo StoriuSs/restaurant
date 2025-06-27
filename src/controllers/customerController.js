@@ -160,7 +160,6 @@ class CustomerController {
 		try {
 			await connection.beginTransaction();
 
-			// Xóa phone và email trước
 			await connection.execute(
 				"DELETE FROM Customer_Phone WHERE customer_id = ?",
 				[id]
@@ -170,7 +169,6 @@ class CustomerController {
 				[id]
 			);
 
-			// Xóa customer
 			await connection.execute(
 				"DELETE FROM Customer WHERE customer_id = ?",
 				[id]
