@@ -687,22 +687,22 @@ async function loadEmployees() {
 
 			const row = tbody.insertRow();
 			row.innerHTML = `
-                <td>${employee.employee_id}</td>
-                <td>${employee.f_name} ${employee.l_name}</td>
-                <td>${formatDate(employee.DoB)}</td>
-                <td>${roleText[employee.role]}</td>                <td>${
-				employee.salary ? formatSalary(employee.salary) : "Chưa có"
-			}</td>
-                <td>${employee.phones || "Chưa có"}</td>
-                <td class="action-buttons">
-                    <button class="btn btn-warning btn-sm" onclick="editEmployee(${
+				<td>${employee.employee_id}</td>
+				<td>${employee.f_name} ${employee.l_name}</td>
+				<td>${formatDate(employee.DoB)}</td>
+				<td>${roleText[employee.role]}</td>
+				<td>${employee.salary ? formatSalary(employee.salary) : "Chưa có"}</td>
+				<td>${employee.phones || "Chưa có"}</td>
+				<td>${employee.emails || "Chưa có"}</td>
+				<td class="action-buttons">
+					<button class="btn btn-warning btn-sm" onclick="editEmployee(${
 						employee.employee_id
 					})">Sửa</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteEmployee(${
+					<button class="btn btn-danger btn-sm" onclick="deleteEmployee(${
 						employee.employee_id
 					})">Xóa</button>
-                </td>
-            `;
+				</td>
+			`;
 		});
 	} catch (error) {
 		showAlert("Lỗi tải dữ liệu nhân viên: " + error.message, "error");
