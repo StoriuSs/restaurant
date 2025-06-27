@@ -40,6 +40,9 @@
 				<button class="tab-button" onclick="showTab('orderItems')">
 					🍽️ Món trong đơn
 				</button>
+				<button class="tab-button" onclick="showTab('discounts')">
+					🏷️ Giảm giá
+				</button>
 			</nav>
 
 			<!-- Tab Khách hàng -->
@@ -643,6 +646,80 @@
 								<th>Tên món</th>
 								<th>Số lượng</th>
 								<th>Ghi chú</th>
+								<th>Thao tác</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+				</div>
+			</div>
+
+			<!-- Tab Discount (Giảm giá) -->
+			<div id="discounts" class="tab-content">
+				<div class="section-header">
+					<h2>Quản lý Mã Giảm Giá (Discount)</h2>
+					<button class="btn btn-primary" onclick="showAddDiscountForm()">+ Thêm mã giảm giá</button>
+				</div>
+				<div id="discountForm" class="form-container" style="display: none">
+					<form id="addDiscountForm">
+						<h3>Thông tin mã giảm giá</h3>
+						<div class="form-group">
+							<label>Mã code:</label>
+							<input type="text" id="discount_code" required />
+						</div>
+						<div class="form-group">
+							<label>Mô tả:</label>
+							<input type="text" id="discount_description" />
+						</div>
+						<div class="form-group">
+							<label>Loại:</label>
+							<select id="discount_type">
+								<option value="percent">Phần trăm</option>
+								<option value="amount">Số tiền</option>
+							</select>
+						</div>
+						<div class="form-group">
+							<label>Giá trị:</label>
+							<input type="number" id="discount_value" min="0" required />
+						</div>
+						<div class="form-group">
+							<label>Áp dụng từ:</label>
+							<input type="date" id="discount_valid_from" required />
+						</div>
+						<div class="form-group">
+							<label>Đến ngày:</label>
+							<input type="date" id="discount_valid_to" required />
+						</div>
+						<div class="form-group">
+							<label>Đơn tối thiểu:</label>
+							<input type="number" id="discount_min_order_amount" min="0" required />
+						</div>
+						<div class="form-group">
+							<label>Kích hoạt:</label>
+							<select id="discount_is_active">
+								<option value="true">Có</option>
+								<option value="false">Không</option>
+							</select>
+						</div>
+						<div class="form-actions">
+							<button type="submit" class="btn btn-success">Lưu</button>
+							<button type="button" class="btn btn-secondary" onclick="hideDiscountForm()">Hủy</button>
+						</div>
+					</form>
+				</div>
+				<div class="table-container">
+					<table id="discountsTable">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Code</th>
+								<th>Mô tả</th>
+								<th>Loại</th>
+								<th>Giá trị</th>
+								<th>Áp dụng từ</th>
+								<th>Đến ngày</th>
+								<th>Đơn tối thiểu</th>
+								<th>Kích hoạt</th>
 								<th>Thao tác</th>
 							</tr>
 						</thead>

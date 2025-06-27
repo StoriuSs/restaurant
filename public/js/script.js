@@ -51,6 +51,9 @@ function showTab(tabName) {
 		case "orderItems":
 			loadOrderItems();
 			break;
+		case "discounts":
+			loadDiscounts();
+			break;
 	}
 }
 
@@ -149,6 +152,18 @@ function setupFormSubmissions() {
 				updateOrderItem();
 			} else {
 				addOrderItem();
+			}
+		});
+
+	// Discount form
+	document
+		.getElementById("addDiscountForm")
+		.addEventListener("submit", function (e) {
+			e.preventDefault();
+			if (currentEditId && currentEditType === "discount") {
+				updateDiscount();
+			} else {
+				addDiscount();
 			}
 		});
 }
@@ -1497,10 +1512,154 @@ async function confirmDeleteOrderItem(order_id, dish_id) {
 	hideDeleteModal();
 }
 
-function formatDateTime(dt) {
-	if (!dt) return "";
-	const d = new Date(dt);
-	return d.toLocaleString("vi-VN");
+// ==================== DISCOUNT FUNCTIONS ====================
+async function loadDiscounts() {
+    try {
+        const response = await fetch("/api/discounts");
+        const discounts = await response.json();
+        const tbody = document.querySelector("#discountsTable tbody");
+        tbody.innerHTML = "";
+        discounts.forEach((d) => {
+            const typeText = { percent: "%", amount: "VNĐ" };
+            const activeText = { true: "Có", false: "Không", 1: "Có", 0: "Không" };
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td>${d.discount_id}</td>
+                <td>${d.code}</td>
+                <td>${d.description || ""}</td>
+                <td>${typeText[d.type]}</td>
+                <td>${d.value}</td>
+                <td>${d.valid_from}</td>
+                <td>${d.valid_to}</td>
+                <td>${d.min_order_amount}</td>
+                <td>${activeText[d.is_active]}</td>
+                <td class="action-buttons">
+                    <button class="btn btn-warning btn-sm" onclick="editDiscount(${d.discount_id})">Sửa</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteDiscount(${d.discount_id})">Xóa</button>
+                </td>
+            `;
+        });
+    } catch (error) {
+        showAlert("Lỗi tải dữ liệu giảm giá: " + error.message, "error");
+    }
+}
+
+function showAddDiscountForm() {
+    document.getElementById("discountForm").style.display = "block";
+    document.getElementById("addDiscountForm").reset();
+    currentEditId = null;
+    currentEditType = null;
+}
+
+function hideDiscountForm() {
+    document.getElementById("discountForm").style.display = "none";
+    currentEditId = null;
+    currentEditType = null;
+}
+
+async function addDiscount() {
+    const formData = {
+        code: document.getElementById("discount_code").value,
+        description: document.getElementById("discount_description").value,
+        type: document.getElementById("discount_type").value,
+        value: parseInt(document.getElementById("discount_value").value),
+        valid_from: document.getElementById("discount_valid_from").value,
+        valid_to: document.getElementById("discount_valid_to").value,
+        min_order_amount: parseInt(document.getElementById("discount_min_order_amount").value),
+        is_active: document.getElementById("discount_is_active").value === "true"
+    };
+    try {
+        const response = await fetch("/api/discounts", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData),
+        });
+        const result = await response.json();
+        if (result.success) {
+            showAlert("Thêm mã giảm giá thành công!", "success");
+            hideDiscountForm();
+            loadDiscounts();
+        } else {
+            showAlert("Lỗi: " + result.error, "error");
+        }
+    } catch (error) {
+        showAlert("Lỗi kết nối: " + error.message, "error");
+    }
+}
+
+async function editDiscount(id) {
+    try {
+        const response = await fetch("/api/discounts");
+        const discounts = await response.json();
+        const d = discounts.find((d) => d.discount_id === id);
+        if (d) {
+            document.getElementById("discount_code").value = d.code;
+            document.getElementById("discount_description").value = d.description || "";
+            document.getElementById("discount_type").value = d.type;
+            document.getElementById("discount_value").value = d.value;
+            document.getElementById("discount_valid_from").value = d.valid_from;
+            document.getElementById("discount_valid_to").value = d.valid_to;
+            document.getElementById("discount_min_order_amount").value = d.min_order_amount;
+            document.getElementById("discount_is_active").value = d.is_active ? "true" : "false";
+            currentEditId = id;
+            currentEditType = "discount";
+            document.getElementById("discountForm").style.display = "block";
+        }
+    } catch (error) {
+        showAlert("Lỗi tải thông tin giảm giá: " + error.message, "error");
+    }
+}
+
+async function updateDiscount() {
+    const formData = {
+        code: document.getElementById("discount_code").value,
+        description: document.getElementById("discount_description").value,
+        type: document.getElementById("discount_type").value,
+        value: parseInt(document.getElementById("discount_value").value),
+        valid_from: document.getElementById("discount_valid_from").value,
+        valid_to: document.getElementById("discount_valid_to").value,
+        min_order_amount: parseInt(document.getElementById("discount_min_order_amount").value),
+        is_active: document.getElementById("discount_is_active").value === "true"
+    };
+    try {
+        const response = await fetch(`/api/discounts/${currentEditId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData),
+        });
+        const result = await response.json();
+        if (result.success) {
+            showAlert("Cập nhật mã giảm giá thành công!", "success");
+            hideDiscountForm();
+            loadDiscounts();
+        } else {
+            showAlert("Lỗi: " + result.error, "error");
+        }
+    } catch (error) {
+        showAlert("Lỗi kết nối: " + error.message, "error");
+    }
+}
+
+function deleteDiscount(id) {
+    showDeleteModal(() => confirmDeleteDiscount(id));
+}
+
+async function confirmDeleteDiscount(id) {
+    try {
+        const response = await fetch(`/api/discounts/${id}`, {
+            method: "DELETE",
+        });
+        const result = await response.json();
+        if (result.success) {
+            showAlert("Xóa mã giảm giá thành công!", "success");
+            loadDiscounts();
+        } else {
+            showAlert("Lỗi: " + result.error, "error");
+        }
+    } catch (error) {
+        showAlert("Lỗi kết nối: " + error.message, "error");
+    }
+    hideDeleteModal();
 }
 
 // ==================== UTILITY FUNCTIONS ====================
@@ -1569,4 +1728,10 @@ function formatSalary(salary) {
 			: roundedSalary.toFixed(2);
 
 	return salaryStr + " tr";
+}
+
+function formatDateTime(dt) {
+    if (!dt) return "";
+    const d = new Date(dt);
+    return d.toLocaleString("vi-VN");
 }
