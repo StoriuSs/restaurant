@@ -34,6 +34,9 @@
 				<button class="tab-button" onclick="showTab('customerOrders')">
 					🧾 Đơn hàng
 				</button>
+				<button class="tab-button" onclick="showTab('handles')">
+					🛠️ Phân công
+				</button>
 			</nav>
 
 			<!-- Tab Khách hàng -->
@@ -499,6 +502,72 @@
 								<th>Bàn</th>
 								<th>Thời gian</th>
 								<th>Trạng thái</th>
+								<th>Thao tác</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+				</div>
+			</div>
+
+			<!-- Tab Handles (Phân công) -->
+			<div id="handles" class="tab-content">
+				<div class="section-header">
+					<h2>Quản lý Phân công (Handles)</h2>
+					<button
+						class="btn btn-primary"
+						onclick="showAddHandleForm()">
+						+ Thêm phân công
+					</button>
+				</div>
+				<div
+					id="handleForm"
+					class="form-container"
+					style="display: none">
+					<form id="addHandleForm">
+						<h3>Thông tin phân công</h3>
+						<div class="form-group">
+							<label>Nhân viên (ID):</label>
+							<input
+								type="number"
+								id="handle_employee_id"
+								required />
+						</div>
+						<div class="form-group">
+							<label>Đơn hàng (ID):</label>
+							<input
+								type="number"
+								id="handle_order_id"
+								required />
+						</div>
+						<div class="form-group">
+							<label>Vai trò:</label>
+							<select id="handle_role_in_order">
+								<option value="waiter">Phục vụ</option>
+								<option value="chef">Đầu bếp</option>
+								<option value="cashier">Thu ngân</option>
+							</select>
+						</div>
+						<div class="form-actions">
+							<button type="submit" class="btn btn-success">
+								Lưu
+							</button>
+							<button
+								type="button"
+								class="btn btn-secondary"
+								onclick="hideHandleForm()">
+								Hủy
+							</button>
+						</div>
+					</form>
+				</div>
+				<div class="table-container">
+					<table id="handlesTable">
+						<thead>
+							<tr>
+								<th>Nhân viên</th>
+								<th>Đơn hàng</th>
+								<th>Vai trò</th>
 								<th>Thao tác</th>
 							</tr>
 						</thead>

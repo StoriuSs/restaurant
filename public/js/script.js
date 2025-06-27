@@ -45,6 +45,9 @@ function showTab(tabName) {
 		case "customerOrders":
 			loadCustomerOrders();
 			break;
+		case "handles":
+			loadHandles();
+			break;
 	}
 }
 
@@ -119,6 +122,18 @@ function setupFormSubmissions() {
 				updateCustomerOrder();
 			} else {
 				addCustomerOrder();
+			}
+		});
+
+	// Handles form
+	document
+		.getElementById("addHandleForm")
+		.addEventListener("submit", function (e) {
+			e.preventDefault();
+			if (currentEditId && currentEditType === "handle") {
+				updateHandle();
+			} else {
+				addHandle();
 			}
 		});
 }
@@ -1087,6 +1102,191 @@ async function confirmDeleteCustomerOrder(id) {
 		if (result.success) {
 			showAlert("Xóa đơn hàng thành công!", "success");
 			loadCustomerOrders();
+		} else {
+			showAlert("Lỗi: " + result.error, "error");
+		}
+	} catch (error) {
+		showAlert("Lỗi kết nối: " + error.message, "error");
+	}
+	hideDeleteModal();
+}
+
+// ==================== HANDLES FUNCTIONS ====================
+async function loadHandles() {
+	try {
+		const response = await fetch("/api/handles");
+		const handles = await response.json();
+		const tbody = document.querySelector("#handlesTable tbody");
+		tbody.innerHTML = "";
+		handles.forEach((h) => {
+			const roleText = {
+				waiter: "Phục vụ",
+				chef: "Đầu bếp",
+				cashier: "Thu ngân",
+			};
+			const row = tbody.insertRow();
+			row.innerHTML = `
+                <td>${h.f_name || ""} ${h.l_name || ""} (ID: ${
+				h.employee_id
+			})</td>
+                <td>${h.order_id} (Bàn: ${h.table_id || "?"})</td>
+                <td><span class="status-badge status-${h.role_in_order}">${
+				roleText[h.role_in_order]
+			}</span></td>
+                <td class="action-buttons">
+                    <button class="btn btn-warning btn-sm" onclick="editHandle(${
+						h.employee_id
+					},${h.order_id})">Sửa</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteHandle(${
+						h.employee_id
+					},${h.order_id})">Xóa</button>
+                </td>
+            `;
+		});
+	} catch (error) {
+		showAlert("Lỗi tải dữ liệu phân công: " + error.message, "error");
+	}
+}
+
+function showAddHandleForm() {
+	document.getElementById("handleForm").style.display = "block";
+	document.getElementById("addHandleForm").reset();
+	currentEditId = null;
+	currentEditType = null;
+}
+
+function hideHandleForm() {
+	document.getElementById("handleForm").style.display = "none";
+	currentEditId = null;
+	currentEditType = null;
+}
+
+async function addHandle() {
+	const formData = {
+		employee_id: parseInt(
+			document.getElementById("handle_employee_id").value
+		),
+		order_id: parseInt(document.getElementById("handle_order_id").value),
+		role_in_order: document.getElementById("handle_role_in_order").value,
+	};
+	try {
+		const response = await fetch("/api/handles", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(formData),
+		});
+		const result = await response.json();
+		if (result.success) {
+			showAlert("Thêm phân công thành công!", "success");
+			hideHandleForm();
+			loadHandles();
+		} else {
+			showAlert("Lỗi: " + result.error, "error");
+		}
+	} catch (error) {
+		showAlert("Lỗi kết nối: " + error.message, "error");
+	}
+}
+
+async function editHandle(employee_id, order_id) {
+	try {
+		const response = await fetch("/api/handles");
+		const handles = await response.json();
+		const h = handles.find(
+			(h) => h.employee_id === employee_id && h.order_id === order_id
+		);
+		if (h) {
+			document.getElementById("handle_employee_id").value = h.employee_id;
+			document.getElementById("handle_order_id").value = h.order_id;
+			document.getElementById("handle_role_in_order").value =
+				h.role_in_order;
+			currentEditId = { employee_id, order_id };
+			currentEditType = "handle";
+			document.getElementById("handleForm").style.display = "block";
+		}
+	} catch (error) {
+		showAlert("Lỗi tải thông tin phân công: " + error.message, "error");
+	}
+}
+
+async function updateHandle() {
+	const old = currentEditId;
+	const newEmployeeId = parseInt(
+		document.getElementById("handle_employee_id").value
+	);
+	const newOrderId = parseInt(
+		document.getElementById("handle_order_id").value
+	);
+	const newRole = document.getElementById("handle_role_in_order").value;
+	// Nếu thay đổi employee_id hoặc order_id thì xóa bản ghi cũ và thêm mới
+	if (old.employee_id !== newEmployeeId || old.order_id !== newOrderId) {
+		try {
+			// Xóa bản ghi cũ
+			await fetch(`/api/handles/${old.employee_id}/${old.order_id}`, {
+				method: "DELETE",
+			});
+			// Thêm bản ghi mới
+			const response = await fetch("/api/handles", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					employee_id: newEmployeeId,
+					order_id: newOrderId,
+					role_in_order: newRole,
+				}),
+			});
+			const result = await response.json();
+			if (result.success) {
+				showAlert("Cập nhật phân công thành công!", "success");
+				hideHandleForm();
+				loadHandles();
+			} else {
+				showAlert("Lỗi: " + result.error, "error");
+			}
+		} catch (error) {
+			showAlert("Lỗi kết nối: " + error.message, "error");
+		}
+	} else {
+		// Nếu không đổi khóa chính thì chỉ update role_in_order
+		try {
+			const response = await fetch(
+				`/api/handles/${old.employee_id}/${old.order_id}`,
+				{
+					method: "PUT",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ role_in_order: newRole }),
+				}
+			);
+			const result = await response.json();
+			if (result.success) {
+				showAlert("Cập nhật phân công thành công!", "success");
+				hideHandleForm();
+				loadHandles();
+			} else {
+				showAlert("Lỗi: " + result.error, "error");
+			}
+		} catch (error) {
+			showAlert("Lỗi kết nối: " + error.message, "error");
+		}
+	}
+}
+
+function deleteHandle(employee_id, order_id) {
+	showDeleteModal(() => confirmDeleteHandle(employee_id, order_id));
+}
+
+async function confirmDeleteHandle(employee_id, order_id) {
+	try {
+		const response = await fetch(
+			`/api/handles/${employee_id}/${order_id}`,
+			{
+				method: "DELETE",
+			}
+		);
+		const result = await response.json();
+		if (result.success) {
+			showAlert("Xóa phân công thành công!", "success");
+			loadHandles();
 		} else {
 			showAlert("Lỗi: " + result.error, "error");
 		}
