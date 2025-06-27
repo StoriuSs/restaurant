@@ -54,6 +54,9 @@ function showTab(tabName) {
 		case "discounts":
 			loadDiscounts();
 			break;
+		case "invoices":
+			loadInvoices();
+			break;
 	}
 }
 
@@ -164,6 +167,18 @@ function setupFormSubmissions() {
 				updateDiscount();
 			} else {
 				addDiscount();
+			}
+		});
+
+	// Invoice form
+	document
+		.getElementById("addInvoiceForm")
+		.addEventListener("submit", function (e) {
+			e.preventDefault();
+			if (currentEditId && currentEditType === "invoice") {
+				updateInvoice();
+			} else {
+				addInvoice();
 			}
 		});
 }
@@ -1672,6 +1687,144 @@ async function confirmDeleteDiscount(id) {
 		if (result.success) {
 			showAlert("Xóa mã giảm giá thành công!", "success");
 			loadDiscounts();
+		} else {
+			showAlert("Lỗi: " + result.error, "error");
+		}
+	} catch (error) {
+		showAlert("Lỗi kết nối: " + error.message, "error");
+	}
+	hideDeleteModal();
+}
+
+// ==================== INVOICE FUNCTIONS ====================
+async function loadInvoices() {
+	try {
+		const response = await fetch("/api/invoices");
+		const invoices = await response.json();
+		const tbody = document.querySelector("#invoicesTable tbody");
+		tbody.innerHTML = "";
+		invoices.forEach((inv) => {
+			const row = tbody.insertRow();
+			row.innerHTML = `
+                <td>${inv.invoice_id}</td>
+                <td>${inv.order_id}</td>
+                <td>${inv.discount_id || ""}</td>
+                <td>${formatCurrency(inv.total_amount)}</td>
+                <td>${formatDateTime(inv.invoice_time)}</td>
+                <td class="action-buttons">
+                    <button class="btn btn-warning btn-sm" onclick="editInvoice(${
+						inv.invoice_id
+					})">Sửa</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteInvoice(${
+						inv.invoice_id
+					})">Xóa</button>
+                </td>
+            `;
+		});
+	} catch (error) {
+		showAlert("Lỗi tải dữ liệu hóa đơn: " + error.message, "error");
+	}
+}
+
+function showAddInvoiceForm() {
+	document.getElementById("invoiceForm").style.display = "block";
+	document.getElementById("addInvoiceForm").reset();
+	document.getElementById("invoice_total_amount").value = "";
+	currentEditId = null;
+	currentEditType = null;
+}
+
+function hideInvoiceForm() {
+	document.getElementById("invoiceForm").style.display = "none";
+	currentEditId = null;
+	currentEditType = null;
+}
+
+async function addInvoice() {
+	const formData = {
+		order_id: parseInt(document.getElementById("invoice_order_id").value),
+		discount_id: document.getElementById("invoice_discount_id").value
+			? parseInt(document.getElementById("invoice_discount_id").value)
+			: null,
+	};
+	try {
+		const response = await fetch("/api/invoices", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(formData),
+		});
+		const result = await response.json();
+		if (result.success) {
+			showAlert("Tạo hóa đơn thành công!", "success");
+			hideInvoiceForm();
+			loadInvoices();
+		} else {
+			showAlert("Lỗi: " + result.error, "error");
+		}
+	} catch (error) {
+		showAlert("Lỗi kết nối: " + error.message, "error");
+	}
+}
+
+async function editInvoice(id) {
+	try {
+		const response = await fetch("/api/invoices");
+		const invoices = await response.json();
+		const inv = invoices.find((i) => i.invoice_id === id);
+		if (inv) {
+			document.getElementById("invoice_order_id").value = inv.order_id;
+			document.getElementById("invoice_discount_id").value =
+				inv.discount_id || "";
+			document.getElementById("invoice_total_amount").value =
+				inv.total_amount;
+			currentEditId = id;
+			currentEditType = "invoice";
+			document.getElementById("invoiceForm").style.display = "block";
+		}
+	} catch (error) {
+		showAlert("Lỗi tải thông tin hóa đơn: " + error.message, "error");
+	}
+}
+
+async function updateInvoice() {
+	const formData = {
+		order_id: parseInt(document.getElementById("invoice_order_id").value),
+		discount_id: document.getElementById("invoice_discount_id").value
+			? parseInt(document.getElementById("invoice_discount_id").value)
+			: null,
+	};
+	try {
+		const response = await fetch(`/api/invoices/${currentEditId}`, {
+			method: "PUT",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(formData),
+		});
+		const result = await response.json();
+		if (result.success) {
+			showAlert("Cập nhật hóa đơn thành công!", "success");
+			hideInvoiceForm();
+			loadInvoices();
+		} else {
+			showAlert("Lỗi: " + result.error, "error");
+		}
+	} catch (error) {
+		showAlert("Lỗi kết nối: " + error.message, "error");
+	}
+}
+
+function deleteInvoice(id) {
+	showDeleteModal(() => confirmDeleteInvoice(id));
+}
+
+async function confirmDeleteInvoice(id) {
+	try {
+		const response = await fetch(`/api/invoices/${id}`, {
+			method: "DELETE",
+		});
+		const result = await response.json();
+		if (result.success) {
+			showAlert("Xóa hóa đơn thành công!", "success");
+			loadInvoices();
 		} else {
 			showAlert("Lỗi: " + result.error, "error");
 		}

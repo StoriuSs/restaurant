@@ -12,6 +12,7 @@ const customerOrderRoutes = require("./src/routes/customerOrders");
 const handlesRoutes = require("./src/routes/handles");
 const orderItemsRoutes = require("./src/routes/orderItems");
 const discountsRoutes = require("./src/routes/discounts");
+const invoicesRoutes = require("./src/routes/invoices");
 
 const app = express();
 const PORT = 3000;
@@ -36,6 +37,7 @@ app.use("/api/customer-orders", customerOrderRoutes);
 app.use("/api/handles", handlesRoutes);
 app.use("/api/order-items", orderItemsRoutes);
 app.use("/api/discounts", discountsRoutes);
+app.use("/api/invoices", invoicesRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -61,4 +63,5 @@ app.listen(PORT, () => {
 	console.log("- GET/POST/PUT/DELETE /api/handles");
 	console.log("- GET/POST/PUT/DELETE /api/order-items");
 	console.log("- GET/POST/PUT/DELETE /api/discounts");
+	console.log("- GET/POST/PUT/DELETE /api/invoices");
 });
