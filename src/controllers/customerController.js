@@ -21,7 +21,7 @@ class CustomerController {
 
 	// Thêm khách hàng mới
 	async createCustomer(req, res) {
-		const { f_name, l_name, age, phone, email } = req.body;
+		const { f_name, l_name, age, phone, email, phones, emails } = req.body;
 		const connection = await db.getConnection();
 
 		try {
@@ -35,20 +35,40 @@ class CustomerController {
 
 			const customerId = result.insertId;
 
-			// Thêm phone nếu có
-			if (phone && phone.trim()) {
-				await connection.execute(
-					"INSERT INTO Customer_Phone (customer_id, phone) VALUES (?, ?)",
-					[customerId, phone.trim()]
-				);
+			// Xử lý phone(s)
+			let phoneArr = [];
+			if (Array.isArray(phones)) phoneArr = phones;
+			else if (typeof phone === "string")
+				phoneArr = phone
+					.split(/[,;\n\r]+|\s+/)
+					.map((s) => s.trim())
+					.filter(Boolean);
+			else if (phone) phoneArr = [phone];
+			for (const p of phoneArr) {
+				if (p) {
+					await connection.execute(
+						"INSERT INTO Customer_Phone (customer_id, phone) VALUES (?, ?)",
+						[customerId, p]
+					);
+				}
 			}
 
-			// Thêm email nếu có
-			if (email && email.trim()) {
-				await connection.execute(
-					"INSERT INTO Customer_Email (customer_id, email) VALUES (?, ?)",
-					[customerId, email.trim()]
-				);
+			// Xử lý email(s)
+			let emailArr = [];
+			if (Array.isArray(emails)) emailArr = emails;
+			else if (typeof email === "string")
+				emailArr = email
+					.split(/[,;\n\r]+|\s+/)
+					.map((s) => s.trim())
+					.filter(Boolean);
+			else if (email) emailArr = [email];
+			for (const e of emailArr) {
+				if (e) {
+					await connection.execute(
+						"INSERT INTO Customer_Email (customer_id, email) VALUES (?, ?)",
+						[customerId, e]
+					);
+				}
 			}
 
 			await connection.commit();
@@ -64,7 +84,7 @@ class CustomerController {
 	// Cập nhật khách hàng
 	async updateCustomer(req, res) {
 		const { id } = req.params;
-		const { f_name, l_name, age, phone, email } = req.body;
+		const { f_name, l_name, age, phone, email, phones, emails } = req.body;
 		const connection = await db.getConnection();
 
 		try {
@@ -86,20 +106,40 @@ class CustomerController {
 				[id]
 			);
 
-			// Thêm phone mới nếu có
-			if (phone && phone.trim()) {
-				await connection.execute(
-					"INSERT INTO Customer_Phone (customer_id, phone) VALUES (?, ?)",
-					[id, phone.trim()]
-				);
+			// Xử lý phone(s)
+			let phoneArr = [];
+			if (Array.isArray(phones)) phoneArr = phones;
+			else if (typeof phone === "string")
+				phoneArr = phone
+					.split(/[,;\n\r]+|\s+/)
+					.map((s) => s.trim())
+					.filter(Boolean);
+			else if (phone) phoneArr = [phone];
+			for (const p of phoneArr) {
+				if (p) {
+					await connection.execute(
+						"INSERT INTO Customer_Phone (customer_id, phone) VALUES (?, ?)",
+						[id, p]
+					);
+				}
 			}
 
-			// Thêm email mới nếu có
-			if (email && email.trim()) {
-				await connection.execute(
-					"INSERT INTO Customer_Email (customer_id, email) VALUES (?, ?)",
-					[id, email.trim()]
-				);
+			// Xử lý email(s)
+			let emailArr = [];
+			if (Array.isArray(emails)) emailArr = emails;
+			else if (typeof email === "string")
+				emailArr = email
+					.split(/[,;\n\r]+|\s+/)
+					.map((s) => s.trim())
+					.filter(Boolean);
+			else if (email) emailArr = [email];
+			for (const e of emailArr) {
+				if (e) {
+					await connection.execute(
+						"INSERT INTO Customer_Email (customer_id, email) VALUES (?, ?)",
+						[id, e]
+					);
+				}
 			}
 
 			await connection.commit();

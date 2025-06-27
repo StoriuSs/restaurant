@@ -293,7 +293,7 @@ async function editCustomer(id) {
 			currentEditId = id;
 			currentEditType = "customer";
 			document.getElementById("customerForm").style.display = "block";
-            scrollToForm("customerForm");
+			scrollToForm("customerForm");
 		}
 	} catch (error) {
 		showAlert("Lỗi tải thông tin khách hàng: " + error.message, "error");
@@ -2107,8 +2107,8 @@ function renderStatusBadge(type, value) {
 }
 
 function scrollToForm(formId) {
-    const form = document.getElementById(formId);
-    if (form) {
-        form.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
+	const form = document.getElementById(formId);
+	if (form) {
+		form.scrollIntoView({ behavior: "smooth", block: "center" });
+	}
 }

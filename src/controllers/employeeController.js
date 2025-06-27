@@ -32,6 +32,8 @@ class EmployeeController {
 			salary,
 			phone,
 			email,
+			phones,
+			emails,
 		} = req.body;
 		const connection = await db.getConnection();
 
@@ -46,20 +48,40 @@ class EmployeeController {
 
 			const employeeId = result.insertId;
 
-			// Thêm phone nếu có
-			if (phone && phone.trim()) {
-				await connection.execute(
-					"INSERT INTO Employee_Phone (employee_id, phone) VALUES (?, ?)",
-					[employeeId, phone.trim()]
-				);
+			// Xử lý phone(s)
+			let phoneArr = [];
+			if (Array.isArray(phones)) phoneArr = phones;
+			else if (typeof phone === "string")
+				phoneArr = phone
+					.split(/[,;\n\r]+|\s+/)
+					.map((s) => s.trim())
+					.filter(Boolean);
+			else if (phone) phoneArr = [phone];
+			for (const p of phoneArr) {
+				if (p) {
+					await connection.execute(
+						"INSERT INTO Employee_Phone (employee_id, phone) VALUES (?, ?)",
+						[employeeId, p]
+					);
+				}
 			}
 
-			// Thêm email nếu có
-			if (email && email.trim()) {
-				await connection.execute(
-					"INSERT INTO Employee_Email (employee_id, email) VALUES (?, ?)",
-					[employeeId, email.trim()]
-				);
+			// Xử lý email(s)
+			let emailArr = [];
+			if (Array.isArray(emails)) emailArr = emails;
+			else if (typeof email === "string")
+				emailArr = email
+					.split(/[,;\n\r]+|\s+/)
+					.map((s) => s.trim())
+					.filter(Boolean);
+			else if (email) emailArr = [email];
+			for (const e of emailArr) {
+				if (e) {
+					await connection.execute(
+						"INSERT INTO Employee_Email (employee_id, email) VALUES (?, ?)",
+						[employeeId, e]
+					);
+				}
 			}
 
 			await connection.commit();
@@ -86,6 +108,8 @@ class EmployeeController {
 			salary,
 			phone,
 			email,
+			phones,
+			emails,
 		} = req.body;
 		const connection = await db.getConnection();
 
@@ -118,20 +142,40 @@ class EmployeeController {
 				[id]
 			);
 
-			// Thêm phone mới nếu có
-			if (phone && phone.trim()) {
-				await connection.execute(
-					"INSERT INTO Employee_Phone (employee_id, phone) VALUES (?, ?)",
-					[id, phone.trim()]
-				);
+			// Xử lý phone(s)
+			let phoneArr = [];
+			if (Array.isArray(phones)) phoneArr = phones;
+			else if (typeof phone === "string")
+				phoneArr = phone
+					.split(/[,;\n\r]+|\s+/)
+					.map((s) => s.trim())
+					.filter(Boolean);
+			else if (phone) phoneArr = [phone];
+			for (const p of phoneArr) {
+				if (p) {
+					await connection.execute(
+						"INSERT INTO Employee_Phone (employee_id, phone) VALUES (?, ?)",
+						[id, p]
+					);
+				}
 			}
 
-			// Thêm email mới nếu có
-			if (email && email.trim()) {
-				await connection.execute(
-					"INSERT INTO Employee_Email (employee_id, email) VALUES (?, ?)",
-					[id, email.trim()]
-				);
+			// Xử lý email(s)
+			let emailArr = [];
+			if (Array.isArray(emails)) emailArr = emails;
+			else if (typeof email === "string")
+				emailArr = email
+					.split(/[,;\n\r]+|\s+/)
+					.map((s) => s.trim())
+					.filter(Boolean);
+			else if (email) emailArr = [email];
+			for (const e of emailArr) {
+				if (e) {
+					await connection.execute(
+						"INSERT INTO Employee_Email (employee_id, email) VALUES (?, ?)",
+						[id, e]
+					);
+				}
 			}
 
 			await connection.commit();
