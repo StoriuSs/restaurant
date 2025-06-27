@@ -18,6 +18,14 @@ class DishController {
 		const { name, category, price, description, availability } = req.body;
 
 		try {
+			if (!name || name.trim() === "") {
+				return res
+					.status(400)
+					.json({ error: "Tên món ăn không được để trống!" });
+			}
+			if (price === undefined || price < 0) {
+				return res.status(400).json({ error: "Giá món ăn phải >= 0!" });
+			}
 			const [result] = await db.execute(
 				"INSERT INTO Dish (name, category, price, description, availability) VALUES (?, ?, ?, ?, ?)",
 				[
@@ -40,6 +48,14 @@ class DishController {
 		const { name, category, price, description, availability } = req.body;
 
 		try {
+			if (!name || name.trim() === "") {
+				return res
+					.status(400)
+					.json({ error: "Tên món ăn không được để trống!" });
+			}
+			if (price === undefined || price < 0) {
+				return res.status(400).json({ error: "Giá món ăn phải >= 0!" });
+			}
 			await db.execute(
 				"UPDATE Dish SET name = ?, category = ?, price = ?, description = ?, availability = ? WHERE dish_id = ?",
 				[name, category, price, description, availability, id]

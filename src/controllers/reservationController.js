@@ -27,6 +27,18 @@ class ReservationController {
 			status,
 		} = req.body;
 		try {
+			// Lấy số ghế của bàn
+			const [tables] = await db.execute(
+				"SELECT num_seats FROM RestaurantTable WHERE table_id = ?",
+				[table_id]
+			);
+			if (!tables.length)
+				return res.status(400).json({ error: "Bàn không tồn tại!" });
+			if (number_guests > tables[0].num_seats) {
+				return res.status(400).json({
+					error: `Số khách (${number_guests}) vượt quá số ghế của bàn (${tables[0].num_seats})!`,
+				});
+			}
 			const [result] = await db.execute(
 				`INSERT INTO Reservation (customer_id, table_id, reservation_time, number_guests, status) VALUES (?, ?, ?, ?, ?)`,
 				[
@@ -54,6 +66,18 @@ class ReservationController {
 			status,
 		} = req.body;
 		try {
+			// Lấy số ghế của bàn
+			const [tables] = await db.execute(
+				"SELECT num_seats FROM RestaurantTable WHERE table_id = ?",
+				[table_id]
+			);
+			if (!tables.length)
+				return res.status(400).json({ error: "Bàn không tồn tại!" });
+			if (number_guests > tables[0].num_seats) {
+				return res.status(400).json({
+					error: `Số khách (${number_guests}) vượt quá số ghế của bàn (${tables[0].num_seats})!`,
+				});
+			}
 			await db.execute(
 				`UPDATE Reservation SET customer_id = ?, table_id = ?, reservation_time = ?, number_guests = ?, status = ? WHERE reservation_id = ?`,
 				[

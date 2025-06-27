@@ -21,6 +21,24 @@ class OrderItemController {
 	async createOrderItem(req, res) {
 		const { order_id, dish_id, quantity, note } = req.body;
 		try {
+			// Kiểm tra số lượng > 0
+			if (!quantity || quantity <= 0) {
+				return res
+					.status(400)
+					.json({ error: "Số lượng phải lớn hơn 0!" });
+			}
+			// Kiểm tra món ăn có tồn tại và còn phục vụ không
+			const [dishes] = await db.execute(
+				"SELECT * FROM Dish WHERE dish_id = ? AND availability = 1",
+				[dish_id]
+			);
+			if (!dishes.length) {
+				return res
+					.status(400)
+					.json({
+						error: "Món ăn không tồn tại hoặc đã ngừng phục vụ!",
+					});
+			}
 			await db.execute(
 				`INSERT INTO OrderItem (order_id, dish_id, quantity, note) VALUES (?, ?, ?, ?)`,
 				[order_id, dish_id, quantity, note]
@@ -36,6 +54,22 @@ class OrderItemController {
 		const { order_id, dish_id } = req.params;
 		const { new_order_id, new_dish_id, quantity, note } = req.body;
 		try {
+			if (!quantity || quantity <= 0) {
+				return res
+					.status(400)
+					.json({ error: "Số lượng phải lớn hơn 0!" });
+			}
+			const [dishes] = await db.execute(
+				"SELECT * FROM Dish WHERE dish_id = ? AND availability = 1",
+				[new_dish_id]
+			);
+			if (!dishes.length) {
+				return res
+					.status(400)
+					.json({
+						error: "Món ăn không tồn tại hoặc đã ngừng phục vụ!",
+					});
+			}
 			if (
 				parseInt(order_id) !== parseInt(new_order_id) ||
 				parseInt(dish_id) !== parseInt(new_dish_id)

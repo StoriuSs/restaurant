@@ -52,6 +52,15 @@ class PaymentController {
 				return res
 					.status(400)
 					.json({ error: "Invoice này đã có payment!" });
+			// Kiểm tra invoice có tồn tại không
+			const [invs] = await db.execute(
+				`SELECT * FROM Invoice WHERE invoice_id = ?`,
+				[invoice_id]
+			);
+			if (!invs.length)
+				return res
+					.status(400)
+					.json({ error: "Hóa đơn không tồn tại!" });
 			await db.execute(
 				`INSERT INTO Payment (invoice_id, payment_method, status) VALUES (?, ?, ?)`,
 				[invoice_id, payment_method, status || "pending"]
@@ -77,6 +86,14 @@ class PaymentController {
 					return res
 						.status(400)
 						.json({ error: "Invoice này đã có payment!" });
+				const [invs] = await db.execute(
+					`SELECT * FROM Invoice WHERE invoice_id = ?`,
+					[invoice_id]
+				);
+				if (!invs.length)
+					return res
+						.status(400)
+						.json({ error: "Hóa đơn không tồn tại!" });
 			}
 			await db.execute(
 				`UPDATE Payment SET invoice_id = ?, payment_method = ?, status = ? WHERE payment_id = ?`,

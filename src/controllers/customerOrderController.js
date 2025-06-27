@@ -20,6 +20,14 @@ class CustomerOrderController {
 	async createOrder(req, res) {
 		const { table_id, order_time, status } = req.body;
 		try {
+			// Kiểm tra bàn có tồn tại không
+			const [tables] = await db.execute(
+				"SELECT * FROM RestaurantTable WHERE table_id = ?",
+				[table_id]
+			);
+			if (!tables.length) {
+				return res.status(400).json({ error: "Bàn không tồn tại!" });
+			}
 			const [result] = await db.execute(
 				`INSERT INTO CustomerOrder (table_id, order_time, status) VALUES (?, ?, ?)`,
 				[table_id, order_time || null, status || "pending"]
@@ -35,6 +43,13 @@ class CustomerOrderController {
 		const { id } = req.params;
 		const { table_id, order_time, status } = req.body;
 		try {
+			const [tables] = await db.execute(
+				"SELECT * FROM RestaurantTable WHERE table_id = ?",
+				[table_id]
+			);
+			if (!tables.length) {
+				return res.status(400).json({ error: "Bàn không tồn tại!" });
+			}
 			await db.execute(
 				`UPDATE CustomerOrder SET table_id = ?, order_time = ?, status = ? WHERE order_id = ?`,
 				[table_id, order_time, status, id]

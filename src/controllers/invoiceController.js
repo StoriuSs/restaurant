@@ -30,6 +30,16 @@ class InvoiceController {
 				return res
 					.status(400)
 					.json({ error: "Đơn hàng không có món nào!" });
+			// Kiểm tra đã có invoice cho order này chưa
+			const [exist] = await db.execute(
+				`SELECT * FROM Invoice WHERE order_id = ?`,
+				[order_id]
+			);
+			if (exist.length) {
+				return res
+					.status(400)
+					.json({ error: "Đơn hàng này đã có hóa đơn!" });
+			}
 			let total = items.reduce((sum, i) => sum + i.quantity * i.price, 0);
 			// Nếu có discount, kiểm tra hợp lệ và áp dụng
 			if (discount_id) {
