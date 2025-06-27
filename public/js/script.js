@@ -293,6 +293,7 @@ async function editCustomer(id) {
 			currentEditId = id;
 			currentEditType = "customer";
 			document.getElementById("customerForm").style.display = "block";
+            scrollToForm("customerForm");
 		}
 	} catch (error) {
 		showAlert("Lỗi tải thông tin khách hàng: " + error.message, "error");
@@ -454,6 +455,7 @@ async function editDish(id) {
 			currentEditId = id;
 			currentEditType = "dish";
 			document.getElementById("dishForm").style.display = "block";
+			scrollToForm("dishForm");
 		}
 	} catch (error) {
 		showAlert("Lỗi tải thông tin món ăn: " + error.message, "error");
@@ -607,6 +609,7 @@ async function editTable(id) {
 			currentEditId = id;
 			currentEditType = "table";
 			document.getElementById("tableForm").style.display = "block";
+			scrollToForm("tableForm");
 		}
 	} catch (error) {
 		showAlert("Lỗi tải thông tin bàn ăn: " + error.message, "error");
@@ -790,6 +793,7 @@ async function editEmployee(id) {
 			currentEditId = id;
 			currentEditType = "employee";
 			document.getElementById("employeeForm").style.display = "block";
+			scrollToForm("employeeForm");
 		}
 	} catch (error) {
 		showAlert("Lỗi tải thông tin nhân viên: " + error.message, "error");
@@ -962,6 +966,7 @@ async function editReservation(id) {
 			currentEditId = id;
 			currentEditType = "reservation";
 			document.getElementById("reservationForm").style.display = "block";
+			scrollToForm("reservationForm");
 		}
 	} catch (error) {
 		showAlert("Lỗi tải thông tin đặt bàn: " + error.message, "error");
@@ -1110,6 +1115,7 @@ async function editCustomerOrder(id) {
 			currentEditType = "customerOrder";
 			document.getElementById("customerOrderForm").style.display =
 				"block";
+			scrollToForm("customerOrderForm");
 		}
 	} catch (error) {
 		showAlert("Lỗi tải thông tin đơn hàng: " + error.message, "error");
@@ -1255,6 +1261,7 @@ async function editHandle(employee_id, order_id) {
 			currentEditId = { employee_id, order_id };
 			currentEditType = "handle";
 			document.getElementById("handleForm").style.display = "block";
+			scrollToForm("handleForm");
 		}
 	} catch (error) {
 		showAlert("Lỗi tải thông tin phân công: " + error.message, "error");
@@ -1432,6 +1439,7 @@ async function editOrderItem(order_id, dish_id) {
 			currentEditId = { order_id, dish_id };
 			currentEditType = "orderItem";
 			document.getElementById("orderItemForm").style.display = "block";
+			scrollToForm("orderItemForm");
 		}
 	} catch (error) {
 		showAlert("Lỗi tải thông tin món trong đơn: " + error.message, "error");
@@ -1642,6 +1650,7 @@ async function editDiscount(id) {
 			currentEditId = id;
 			currentEditType = "discount";
 			document.getElementById("discountForm").style.display = "block";
+			scrollToForm("discountForm");
 		}
 	} catch (error) {
 		showAlert("Lỗi tải thông tin giảm giá: " + error.message, "error");
@@ -1787,6 +1796,7 @@ async function editInvoice(id) {
 			currentEditId = id;
 			currentEditType = "invoice";
 			document.getElementById("invoiceForm").style.display = "block";
+			scrollToForm("invoiceForm");
 		}
 	} catch (error) {
 		showAlert("Lỗi tải thông tin hóa đơn: " + error.message, "error");
@@ -2094,4 +2104,11 @@ function renderStatusBadge(type, value) {
 			cls = "";
 	}
 	return `<span class="status-badge ${cls}">${text}</span>`;
+}
+
+function scrollToForm(formId) {
+    const form = document.getElementById(formId);
+    if (form) {
+        form.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
 }
