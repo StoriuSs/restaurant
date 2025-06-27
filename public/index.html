@@ -658,9 +658,16 @@
 			<div id="discounts" class="tab-content">
 				<div class="section-header">
 					<h2>Quản lý Mã Giảm Giá (Discount)</h2>
-					<button class="btn btn-primary" onclick="showAddDiscountForm()">+ Thêm mã giảm giá</button>
+					<button
+						class="btn btn-primary"
+						onclick="showAddDiscountForm()">
+						+ Thêm mã giảm giá
+					</button>
 				</div>
-				<div id="discountForm" class="form-container" style="display: none">
+				<div
+					id="discountForm"
+					class="form-container"
+					style="display: none">
 					<form id="addDiscountForm">
 						<h3>Thông tin mã giảm giá</h3>
 						<div class="form-group">
@@ -680,19 +687,33 @@
 						</div>
 						<div class="form-group">
 							<label>Giá trị:</label>
-							<input type="number" id="discount_value" min="0" required />
+							<input
+								type="number"
+								id="discount_value"
+								min="0"
+								required />
 						</div>
 						<div class="form-group">
 							<label>Áp dụng từ:</label>
-							<input type="date" id="discount_valid_from" required />
+							<input
+								type="date"
+								id="discount_valid_from"
+								required />
 						</div>
 						<div class="form-group">
 							<label>Đến ngày:</label>
-							<input type="date" id="discount_valid_to" required />
+							<input
+								type="date"
+								id="discount_valid_to"
+								required />
 						</div>
 						<div class="form-group">
 							<label>Đơn tối thiểu:</label>
-							<input type="number" id="discount_min_order_amount" min="0" required />
+							<input
+								type="number"
+								id="discount_min_order_amount"
+								min="0"
+								required />
 						</div>
 						<div class="form-group">
 							<label>Kích hoạt:</label>
@@ -702,8 +723,15 @@
 							</select>
 						</div>
 						<div class="form-actions">
-							<button type="submit" class="btn btn-success">Lưu</button>
-							<button type="button" class="btn btn-secondary" onclick="hideDiscountForm()">Hủy</button>
+							<button type="submit" class="btn btn-success">
+								Lưu
+							</button>
+							<button
+								type="button"
+								class="btn btn-secondary"
+								onclick="hideDiscountForm()">
+								Hủy
+							</button>
 						</div>
 					</form>
 				</div>
