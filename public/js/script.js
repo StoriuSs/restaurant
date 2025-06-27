@@ -535,11 +535,9 @@ async function loadTables() {
 			const row = tbody.insertRow();
 			row.innerHTML = `
                 <td>${table.table_id}</td>
-                <td>${table.num_seats} ghế</td>
-                <td><span class="status-badge status-${table.status}">${
-				statusText[table.status]
-			}</span></td>
-                <td class="action-buttons">
+                <td>${table.num_seats}</td>
+                <td>${renderStatusBadge("table", table.status)}</td>
+                <td>
                     <button class="btn btn-warning btn-sm" onclick="editTable(${
 						table.table_id
 					})">Sửa</button>
@@ -881,16 +879,12 @@ async function loadReservations() {
 			const row = tbody.insertRow();
 			row.innerHTML = `
                 <td>${r.reservation_id}</td>
-                <td>${r.customer_first_name || ""} ${
-				r.customer_last_name || ""
-			} (ID: ${r.customer_id})</td>
+                <td>${r.customer_id}</td>
                 <td>${r.table_id}</td>
                 <td>${formatDateTime(r.reservation_time)}</td>
                 <td>${r.number_guests}</td>
-                <td><span class="status-badge status-${r.status}">${
-				statusText[r.status]
-			}</span></td>
-                <td class="action-buttons">
+                <td>${renderStatusBadge("reservation", r.status)}</td>
+                <td>
                     <button class="btn btn-warning btn-sm" onclick="editReservation(${
 						r.reservation_id
 					})">Sửa</button>
@@ -1047,10 +1041,8 @@ async function loadCustomerOrders() {
                 <td>${o.order_id}</td>
                 <td>${o.table_id}</td>
                 <td>${formatDateTime(o.order_time)}</td>
-                <td><span class="status-badge status-${o.status}">${
-				statusText[o.status]
-			}</span></td>
-                <td class="action-buttons">
+                <td>${renderStatusBadge("order", o.status)}</td>
+                <td>
                     <button class="btn btn-warning btn-sm" onclick="editCustomerOrder(${
 						o.order_id
 					})">Sửa</button>
@@ -1861,7 +1853,7 @@ async function loadPayments() {
                 <td>${p.payment_id}</td>
                 <td>${p.invoice_id}</td>
                 <td>${formatPaymentMethod(p.payment_method)}</td>
-                <td>${formatPaymentStatus(p.status)}</td>
+                <td>${renderStatusBadge("payment", p.status)}</td>
                 <td>${formatCurrency(p.total_amount)}</td>
                 <td>
                     <button class="btn btn-warning btn-sm" onclick="editPayment(${
@@ -2042,4 +2034,64 @@ function formatDateTime(dt) {
 	if (!dt) return "";
 	const d = new Date(dt);
 	return d.toLocaleString("vi-VN");
+}
+
+// ========== STATUS BADGE HELPERS ==========
+function renderStatusBadge(type, value) {
+	// type: 'table', 'reservation', 'order', 'payment', ...
+	let text = value;
+	let cls = "";
+	switch (type) {
+		case "table":
+			if (value === "available") {
+				text = "TRỐNG";
+				cls = "status-available";
+			} else if (value === "reserved") {
+				text = "ĐÃ ĐẶT";
+				cls = "status-reserved";
+			} else if (value === "occupied") {
+				text = "ĐANG SỬ DỤNG";
+				cls = "status-occupied";
+			}
+			break;
+		case "reservation":
+			if (value === "pending") {
+				text = "CHỜ XÁC NHẬN";
+				cls = "status-available";
+			} else if (value === "confirmed") {
+				text = "ĐÃ XÁC NHẬN";
+				cls = "status-reserved";
+			} else if (value === "cancelled") {
+				text = "ĐÃ HỦY";
+				cls = "status-inactive";
+			}
+			break;
+		case "order":
+			if (value === "pending") {
+				text = "CHỜ PHỤC VỤ";
+				cls = "status-available";
+			} else if (value === "served") {
+				text = "ĐÃ PHỤC VỤ";
+				cls = "status-reserved";
+			} else if (value === "cancelled") {
+				text = "ĐÃ HỦY";
+				cls = "status-inactive";
+			}
+			break;
+		case "payment":
+			if (value === "pending") {
+				text = "CHỜ XỬ LÝ";
+				cls = "status-available";
+			} else if (value === "success") {
+				text = "THÀNH CÔNG";
+				cls = "status-reserved";
+			} else if (value === "failure") {
+				text = "THẤT BẠI";
+				cls = "status-inactive";
+			}
+			break;
+		default:
+			cls = "";
+	}
+	return `<span class="status-badge ${cls}">${text}</span>`;
 }

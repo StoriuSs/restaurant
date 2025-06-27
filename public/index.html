@@ -19,26 +19,26 @@
 					onclick="showTab('customers')">
 					👥 Khách hàng
 				</button>
-				<button class="tab-button" onclick="showTab('dishes')">
-					🍜 Món ăn
-				</button>
 				<button class="tab-button" onclick="showTab('tables')">
 					🪑 Bàn ăn
-				</button>
-				<button class="tab-button" onclick="showTab('employees')">
-					👨‍💼 Nhân viên
 				</button>
 				<button class="tab-button" onclick="showTab('reservations')">
 					📅 Đặt bàn
 				</button>
+				<button class="tab-button" onclick="showTab('dishes')">
+					🍜 Món ăn
+				</button>
 				<button class="tab-button" onclick="showTab('customerOrders')">
 					🧾 Đơn hàng
 				</button>
-				<button class="tab-button" onclick="showTab('handles')">
-					🛠️ Phân công
-				</button>
 				<button class="tab-button" onclick="showTab('orderItems')">
 					🍽️ Món trong đơn
+				</button>
+				<button class="tab-button" onclick="showTab('employees')">
+					👨‍💼 Nhân viên
+				</button>
+				<button class="tab-button" onclick="showTab('handles')">
+					🛠️ Phân công
 				</button>
 				<button class="tab-button" onclick="showTab('discounts')">
 					🏷️ Giảm giá
@@ -123,6 +123,152 @@
 				</div>
 			</div>
 
+			<!-- Tab Bàn ăn -->
+			<div id="tables" class="tab-content">
+				<div class="section-header">
+					<h2>Quản lý Bàn ăn</h2>
+					<button
+						class="btn btn-primary"
+						onclick="showAddTableForm()">
+						+ Thêm bàn
+					</button>
+				</div>
+
+				<div
+					id="tableForm"
+					class="form-container"
+					style="display: none">
+					<form id="addTableForm">
+						<h3>Thông tin bàn ăn</h3>
+						<div class="form-group">
+							<label>Số ghế:</label>
+							<input
+								type="number"
+								id="table_num_seats"
+								min="1"
+								required />
+						</div>
+						<div class="form-group">
+							<label>Trạng thái:</label>
+							<select id="table_status">
+								<option value="available">Trống</option>
+								<option value="reserved">Đã đặt</option>
+								<option value="occupied">Đang sử dụng</option>
+							</select>
+						</div>
+						<div class="form-actions">
+							<button type="submit" class="btn btn-success">
+								Lưu
+							</button>
+							<button
+								type="button"
+								class="btn btn-secondary"
+								onclick="hideTableForm()">
+								Hủy
+							</button>
+						</div>
+					</form>
+				</div>
+
+				<div class="table-container">
+					<table id="tablesTable">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Số ghế</th>
+								<th>Trạng thái</th>
+								<th>Thao tác</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+				</div>
+			</div>
+
+			<!-- Tab Đặt bàn (Reservation) -->
+			<div id="reservations" class="tab-content">
+				<div class="section-header">
+					<h2>Quản lý Đặt bàn</h2>
+					<button
+						class="btn btn-primary"
+						onclick="showAddReservationForm()">
+						+ Thêm đặt bàn
+					</button>
+				</div>
+				<div
+					id="reservationForm"
+					class="form-container"
+					style="display: none">
+					<form id="addReservationForm">
+						<h3>Thông tin đặt bàn</h3>
+						<div class="form-group">
+							<label>Khách hàng (ID):</label>
+							<input
+								type="number"
+								id="reservation_customer_id"
+								required />
+						</div>
+						<div class="form-group">
+							<label>Bàn (ID):</label>
+							<input
+								type="number"
+								id="reservation_table_id"
+								required />
+						</div>
+						<div class="form-group">
+							<label>Thời gian đặt:</label>
+							<input
+								type="datetime-local"
+								id="reservation_time"
+								required />
+						</div>
+						<div class="form-group">
+							<label>Số khách:</label>
+							<input
+								type="number"
+								id="reservation_number_guests"
+								min="1"
+								required />
+						</div>
+						<div class="form-group">
+							<label>Trạng thái:</label>
+							<select id="reservation_status">
+								<option value="pending">Chờ xác nhận</option>
+								<option value="confirmed">Đã xác nhận</option>
+								<option value="cancelled">Đã hủy</option>
+							</select>
+						</div>
+						<div class="form-actions">
+							<button type="submit" class="btn btn-success">
+								Lưu
+							</button>
+							<button
+								type="button"
+								class="btn btn-secondary"
+								onclick="hideReservationForm()">
+								Hủy
+							</button>
+						</div>
+					</form>
+				</div>
+				<div class="table-container">
+					<table id="reservationsTable">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Khách hàng</th>
+								<th>Bàn</th>
+								<th>Thời gian</th>
+								<th>Số khách</th>
+								<th>Trạng thái</th>
+								<th>Thao tác</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+				</div>
+			</div>
+
 			<!-- Tab Món ăn -->
 			<div id="dishes" class="tab-content">
 				<div class="section-header">
@@ -195,37 +341,36 @@
 				</div>
 			</div>
 
-			<!-- Tab Bàn ăn -->
-			<div id="tables" class="tab-content">
+			<!-- Tab Đơn hàng (CustomerOrder) -->
+			<div id="customerOrders" class="tab-content">
 				<div class="section-header">
-					<h2>Quản lý Bàn ăn</h2>
+					<h2>Quản lý Đơn hàng</h2>
 					<button
 						class="btn btn-primary"
-						onclick="showAddTableForm()">
-						+ Thêm bàn
+						onclick="showAddCustomerOrderForm()">
+						+ Thêm đơn hàng
 					</button>
 				</div>
-
 				<div
-					id="tableForm"
+					id="customerOrderForm"
 					class="form-container"
 					style="display: none">
-					<form id="addTableForm">
-						<h3>Thông tin bàn ăn</h3>
+					<form id="addCustomerOrderForm">
+						<h3>Thông tin đơn hàng</h3>
 						<div class="form-group">
-							<label>Số ghế:</label>
-							<input
-								type="number"
-								id="table_num_seats"
-								min="1"
-								required />
+							<label>Bàn (ID):</label>
+							<input type="number" id="order_table_id" required />
+						</div>
+						<div class="form-group">
+							<label>Thời gian đặt:</label>
+							<input type="datetime-local" id="order_time" />
 						</div>
 						<div class="form-group">
 							<label>Trạng thái:</label>
-							<select id="table_status">
-								<option value="available">Trống</option>
-								<option value="reserved">Đã đặt</option>
-								<option value="occupied">Đang sử dụng</option>
+							<select id="order_status">
+								<option value="pending">Chờ phục vụ</option>
+								<option value="served">Đã phục vụ</option>
+								<option value="cancelled">Đã hủy</option>
 							</select>
 						</div>
 						<div class="form-actions">
@@ -235,20 +380,92 @@
 							<button
 								type="button"
 								class="btn btn-secondary"
-								onclick="hideTableForm()">
+								onclick="hideCustomerOrderForm()">
 								Hủy
 							</button>
 						</div>
 					</form>
 				</div>
-
 				<div class="table-container">
-					<table id="tablesTable">
+					<table id="customerOrdersTable">
 						<thead>
 							<tr>
 								<th>ID</th>
-								<th>Số ghế</th>
+								<th>Bàn</th>
+								<th>Thời gian</th>
 								<th>Trạng thái</th>
+								<th>Thao tác</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+				</div>
+			</div>
+
+			<!-- Tab Món trong đơn (OrderItem) -->
+			<div id="orderItems" class="tab-content">
+				<div class="section-header">
+					<h2>Quản lý Món trong Đơn hàng (OrderItem)</h2>
+					<button
+						class="btn btn-primary"
+						onclick="showAddOrderItemForm()">
+						+ Thêm món vào đơn
+					</button>
+				</div>
+				<div
+					id="orderItemForm"
+					class="form-container"
+					style="display: none">
+					<form id="addOrderItemForm">
+						<h3>Thông tin món trong đơn</h3>
+						<div class="form-group">
+							<label>Đơn hàng (ID):</label>
+							<input
+								type="number"
+								id="orderitem_order_id"
+								required />
+						</div>
+						<div class="form-group">
+							<label>Món ăn (ID):</label>
+							<input
+								type="number"
+								id="orderitem_dish_id"
+								required />
+						</div>
+						<div class="form-group">
+							<label>Số lượng:</label>
+							<input
+								type="number"
+								id="orderitem_quantity"
+								min="1"
+								required />
+						</div>
+						<div class="form-group">
+							<label>Ghi chú:</label>
+							<input type="text" id="orderitem_note" />
+						</div>
+						<div class="form-actions">
+							<button type="submit" class="btn btn-success">
+								Lưu
+							</button>
+							<button
+								type="button"
+								class="btn btn-secondary"
+								onclick="hideOrderItemForm()">
+								Hủy
+							</button>
+						</div>
+					</form>
+				</div>
+				<div class="table-container">
+					<table id="orderItemsTable">
+						<thead>
+							<tr>
+								<th>Đơn hàng</th>
+								<th>Món ăn</th>
+								<th>Tên món</th>
+								<th>Số lượng</th>
+								<th>Ghi chú</th>
 								<th>Thao tác</th>
 							</tr>
 						</thead>
@@ -377,151 +594,6 @@
 				</div>
 			</div>
 
-			<!-- Tab Đặt bàn (Reservation) -->
-			<div id="reservations" class="tab-content">
-				<div class="section-header">
-					<h2>Quản lý Đặt bàn</h2>
-					<button
-						class="btn btn-primary"
-						onclick="showAddReservationForm()">
-						+ Thêm đặt bàn
-					</button>
-				</div>
-				<div
-					id="reservationForm"
-					class="form-container"
-					style="display: none">
-					<form id="addReservationForm">
-						<h3>Thông tin đặt bàn</h3>
-						<div class="form-group">
-							<label>Khách hàng (ID):</label>
-							<input
-								type="number"
-								id="reservation_customer_id"
-								required />
-						</div>
-						<div class="form-group">
-							<label>Bàn (ID):</label>
-							<input
-								type="number"
-								id="reservation_table_id"
-								required />
-						</div>
-						<div class="form-group">
-							<label>Thời gian đặt:</label>
-							<input
-								type="datetime-local"
-								id="reservation_time"
-								required />
-						</div>
-						<div class="form-group">
-							<label>Số khách:</label>
-							<input
-								type="number"
-								id="reservation_number_guests"
-								min="1"
-								required />
-						</div>
-						<div class="form-group">
-							<label>Trạng thái:</label>
-							<select id="reservation_status">
-								<option value="pending">Chờ xác nhận</option>
-								<option value="confirmed">Đã xác nhận</option>
-								<option value="cancelled">Đã hủy</option>
-							</select>
-						</div>
-						<div class="form-actions">
-							<button type="submit" class="btn btn-success">
-								Lưu
-							</button>
-							<button
-								type="button"
-								class="btn btn-secondary"
-								onclick="hideReservationForm()">
-								Hủy
-							</button>
-						</div>
-					</form>
-				</div>
-				<div class="table-container">
-					<table id="reservationsTable">
-						<thead>
-							<tr>
-								<th>ID</th>
-								<th>Khách hàng</th>
-								<th>Bàn</th>
-								<th>Thời gian</th>
-								<th>Số khách</th>
-								<th>Trạng thái</th>
-								<th>Thao tác</th>
-							</tr>
-						</thead>
-						<tbody></tbody>
-					</table>
-				</div>
-			</div>
-
-			<!-- Tab Đơn hàng (CustomerOrder) -->
-			<div id="customerOrders" class="tab-content">
-				<div class="section-header">
-					<h2>Quản lý Đơn hàng</h2>
-					<button
-						class="btn btn-primary"
-						onclick="showAddCustomerOrderForm()">
-						+ Thêm đơn hàng
-					</button>
-				</div>
-				<div
-					id="customerOrderForm"
-					class="form-container"
-					style="display: none">
-					<form id="addCustomerOrderForm">
-						<h3>Thông tin đơn hàng</h3>
-						<div class="form-group">
-							<label>Bàn (ID):</label>
-							<input type="number" id="order_table_id" required />
-						</div>
-						<div class="form-group">
-							<label>Thời gian đặt:</label>
-							<input type="datetime-local" id="order_time" />
-						</div>
-						<div class="form-group">
-							<label>Trạng thái:</label>
-							<select id="order_status">
-								<option value="pending">Chờ phục vụ</option>
-								<option value="served">Đã phục vụ</option>
-								<option value="cancelled">Đã hủy</option>
-							</select>
-						</div>
-						<div class="form-actions">
-							<button type="submit" class="btn btn-success">
-								Lưu
-							</button>
-							<button
-								type="button"
-								class="btn btn-secondary"
-								onclick="hideCustomerOrderForm()">
-								Hủy
-							</button>
-						</div>
-					</form>
-				</div>
-				<div class="table-container">
-					<table id="customerOrdersTable">
-						<thead>
-							<tr>
-								<th>ID</th>
-								<th>Bàn</th>
-								<th>Thời gian</th>
-								<th>Trạng thái</th>
-								<th>Thao tác</th>
-							</tr>
-						</thead>
-						<tbody></tbody>
-					</table>
-				</div>
-			</div>
-
 			<!-- Tab Handles (Phân công) -->
 			<div id="handles" class="tab-content">
 				<div class="section-header">
@@ -580,78 +652,6 @@
 								<th>Nhân viên</th>
 								<th>Đơn hàng</th>
 								<th>Vai trò</th>
-								<th>Thao tác</th>
-							</tr>
-						</thead>
-						<tbody></tbody>
-					</table>
-				</div>
-			</div>
-
-			<!-- Tab OrderItem (Món trong đơn) -->
-			<div id="orderItems" class="tab-content">
-				<div class="section-header">
-					<h2>Quản lý Món trong Đơn hàng (OrderItem)</h2>
-					<button
-						class="btn btn-primary"
-						onclick="showAddOrderItemForm()">
-						+ Thêm món vào đơn
-					</button>
-				</div>
-				<div
-					id="orderItemForm"
-					class="form-container"
-					style="display: none">
-					<form id="addOrderItemForm">
-						<h3>Thông tin món trong đơn</h3>
-						<div class="form-group">
-							<label>Đơn hàng (ID):</label>
-							<input
-								type="number"
-								id="orderitem_order_id"
-								required />
-						</div>
-						<div class="form-group">
-							<label>Món ăn (ID):</label>
-							<input
-								type="number"
-								id="orderitem_dish_id"
-								required />
-						</div>
-						<div class="form-group">
-							<label>Số lượng:</label>
-							<input
-								type="number"
-								id="orderitem_quantity"
-								min="1"
-								required />
-						</div>
-						<div class="form-group">
-							<label>Ghi chú:</label>
-							<input type="text" id="orderitem_note" />
-						</div>
-						<div class="form-actions">
-							<button type="submit" class="btn btn-success">
-								Lưu
-							</button>
-							<button
-								type="button"
-								class="btn btn-secondary"
-								onclick="hideOrderItemForm()">
-								Hủy
-							</button>
-						</div>
-					</form>
-				</div>
-				<div class="table-container">
-					<table id="orderItemsTable">
-						<thead>
-							<tr>
-								<th>Đơn hàng</th>
-								<th>Món ăn</th>
-								<th>Tên món</th>
-								<th>Số lượng</th>
-								<th>Ghi chú</th>
 								<th>Thao tác</th>
 							</tr>
 						</thead>
