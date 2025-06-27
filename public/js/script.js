@@ -48,6 +48,9 @@ function showTab(tabName) {
 		case "handles":
 			loadHandles();
 			break;
+		case "orderItems":
+			loadOrderItems();
+			break;
 	}
 }
 
@@ -134,6 +137,18 @@ function setupFormSubmissions() {
 				updateHandle();
 			} else {
 				addHandle();
+			}
+		});
+
+	// OrderItem form
+	document
+		.getElementById("addOrderItemForm")
+		.addEventListener("submit", function (e) {
+			e.preventDefault();
+			if (currentEditId && currentEditType === "orderItem") {
+				updateOrderItem();
+			} else {
+				addOrderItem();
 			}
 		});
 }
@@ -1287,6 +1302,192 @@ async function confirmDeleteHandle(employee_id, order_id) {
 		if (result.success) {
 			showAlert("Xóa phân công thành công!", "success");
 			loadHandles();
+		} else {
+			showAlert("Lỗi: " + result.error, "error");
+		}
+	} catch (error) {
+		showAlert("Lỗi kết nối: " + error.message, "error");
+	}
+	hideDeleteModal();
+}
+
+// ==================== ORDER ITEM FUNCTIONS ====================
+async function loadOrderItems() {
+	try {
+		const response = await fetch("/api/order-items");
+		const items = await response.json();
+		const tbody = document.querySelector("#orderItemsTable tbody");
+		tbody.innerHTML = "";
+		items.forEach((item) => {
+			const row = tbody.insertRow();
+			row.innerHTML = `
+                <td>${item.order_id}</td>
+                <td>${item.dish_id}</td>
+                <td>${item.dish_name || ""}</td>
+                <td>${item.quantity}</td>
+                <td>${item.note || ""}</td>
+                <td class="action-buttons">
+                    <button class="btn btn-warning btn-sm" onclick="editOrderItem(${
+						item.order_id
+					},${item.dish_id})">Sửa</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteOrderItem(${
+						item.order_id
+					},${item.dish_id})">Xóa</button>
+                </td>
+            `;
+		});
+	} catch (error) {
+		showAlert("Lỗi tải dữ liệu món trong đơn: " + error.message, "error");
+	}
+}
+
+function showAddOrderItemForm() {
+	document.getElementById("orderItemForm").style.display = "block";
+	document.getElementById("addOrderItemForm").reset();
+	currentEditId = null;
+	currentEditType = null;
+}
+
+function hideOrderItemForm() {
+	document.getElementById("orderItemForm").style.display = "none";
+	currentEditId = null;
+	currentEditType = null;
+}
+
+async function addOrderItem() {
+	const formData = {
+		order_id: parseInt(document.getElementById("orderitem_order_id").value),
+		dish_id: parseInt(document.getElementById("orderitem_dish_id").value),
+		quantity: parseInt(document.getElementById("orderitem_quantity").value),
+		note: document.getElementById("orderitem_note").value,
+	};
+	try {
+		const response = await fetch("/api/order-items", {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(formData),
+		});
+		const result = await response.json();
+		if (result.success) {
+			showAlert("Thêm món vào đơn thành công!", "success");
+			hideOrderItemForm();
+			loadOrderItems();
+		} else {
+			showAlert("Lỗi: " + result.error, "error");
+		}
+	} catch (error) {
+		showAlert("Lỗi kết nối: " + error.message, "error");
+	}
+}
+
+async function editOrderItem(order_id, dish_id) {
+	try {
+		const response = await fetch("/api/order-items");
+		const items = await response.json();
+		const item = items.find(
+			(i) => i.order_id === order_id && i.dish_id === dish_id
+		);
+		if (item) {
+			document.getElementById("orderitem_order_id").value = item.order_id;
+			document.getElementById("orderitem_dish_id").value = item.dish_id;
+			document.getElementById("orderitem_quantity").value = item.quantity;
+			document.getElementById("orderitem_note").value = item.note || "";
+			currentEditId = { order_id, dish_id };
+			currentEditType = "orderItem";
+			document.getElementById("orderItemForm").style.display = "block";
+		}
+	} catch (error) {
+		showAlert("Lỗi tải thông tin món trong đơn: " + error.message, "error");
+	}
+}
+
+async function updateOrderItem() {
+	const old = currentEditId;
+	const newOrderId = parseInt(
+		document.getElementById("orderitem_order_id").value
+	);
+	const newDishId = parseInt(
+		document.getElementById("orderitem_dish_id").value
+	);
+	const newQuantity = parseInt(
+		document.getElementById("orderitem_quantity").value
+	);
+	const newNote = document.getElementById("orderitem_note").value;
+	// Nếu thay đổi order_id hoặc dish_id thì xóa bản ghi cũ và thêm mới
+	if (old.order_id !== newOrderId || old.dish_id !== newDishId) {
+		try {
+			// Xóa bản ghi cũ
+			await fetch(`/api/order-items/${old.order_id}/${old.dish_id}`, {
+				method: "DELETE",
+			});
+			// Thêm bản ghi mới
+			const response = await fetch("/api/order-items", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					order_id: newOrderId,
+					dish_id: newDishId,
+					quantity: newQuantity,
+					note: newNote,
+				}),
+			});
+			const result = await response.json();
+			if (result.success) {
+				showAlert("Cập nhật món trong đơn thành công!", "success");
+				hideOrderItemForm();
+				loadOrderItems();
+			} else {
+				showAlert("Lỗi: " + result.error, "error");
+			}
+		} catch (error) {
+			showAlert("Lỗi kết nối: " + error.message, "error");
+		}
+	} else {
+		// Nếu không đổi khóa chính thì chỉ update
+		try {
+			const response = await fetch(
+				`/api/order-items/${old.order_id}/${old.dish_id}`,
+				{
+					method: "PUT",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						new_order_id: newOrderId,
+						new_dish_id: newDishId,
+						quantity: newQuantity,
+						note: newNote,
+					}),
+				}
+			);
+			const result = await response.json();
+			if (result.success) {
+				showAlert("Cập nhật món trong đơn thành công!", "success");
+				hideOrderItemForm();
+				loadOrderItems();
+			} else {
+				showAlert("Lỗi: " + result.error, "error");
+			}
+		} catch (error) {
+			showAlert("Lỗi kết nối: " + error.message, "error");
+		}
+	}
+}
+
+function deleteOrderItem(order_id, dish_id) {
+	showDeleteModal(() => confirmDeleteOrderItem(order_id, dish_id));
+}
+
+async function confirmDeleteOrderItem(order_id, dish_id) {
+	try {
+		const response = await fetch(
+			`/api/order-items/${order_id}/${dish_id}`,
+			{
+				method: "DELETE",
+			}
+		);
+		const result = await response.json();
+		if (result.success) {
+			showAlert("Xóa món trong đơn thành công!", "success");
+			loadOrderItems();
 		} else {
 			showAlert("Lỗi: " + result.error, "error");
 		}
